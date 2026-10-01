@@ -1,0 +1,15 @@
+[org.kde.kdecoration2]
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__SynterraGlass
+ButtonsOnLeft=M
+ButtonsOnRight=IAX
+BorderSize=Normal
+
+[Plugins]
+blurEnabled=true
+contrastEnabled=true
+slidingpopupsEnabled=true
+
+[Effect-blur]
+BlurStrength=8
+NoiseStrength=2

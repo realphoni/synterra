@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec kdialog --title 'Welcome to Synterra' --msgbox 'Synterra 0.1 · Prism\n\nAn Arch desktop through glass.\n\nOpen applications from the Synterra orb at the lower left. Change Aurora or Graphite in Desktop and Wallpaper settings.\n\nThis is a live development session. Changes disappear after reboot. A complete installed-system workflow is still in development.'

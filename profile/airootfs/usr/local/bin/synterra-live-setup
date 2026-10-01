@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if ! id live >/dev/null 2>&1; then
+    useradd --create-home --shell /bin/bash --groups wheel live
+    passwd --delete live
+fi

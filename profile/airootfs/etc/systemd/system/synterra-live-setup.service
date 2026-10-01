@@ -1,0 +1,12 @@
+[Unit]
+Description=Prepare Synterra live desktop account
+After=systemd-sysusers.service
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/synterra-live-setup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

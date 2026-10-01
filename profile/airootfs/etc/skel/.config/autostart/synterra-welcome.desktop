@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to Synterra
+Exec=synterra-welcome
+Icon=synterra
+OnlyShowIn=KDE;

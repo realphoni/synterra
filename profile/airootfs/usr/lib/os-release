@@ -1,0 +1,8 @@
+NAME="Synterra"
+PRETTY_NAME="Synterra 0.1 (Prism)"
+ID=synterra
+ID_LIKE=arch
+VERSION_ID=0.1
+BUILD_ID=development
+ANSI_COLOR="38;2;125;183;255"
+LOGO=synterra

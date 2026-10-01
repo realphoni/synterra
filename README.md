@@ -1,2 +1,70 @@
-# synterra
-Synterra is an OS.
+# Synterra
+
+An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
+
+**Status: development source; no ISO has been built or boot-tested yet.** The Manjaro VMware VM is the build host. Windows and WSL are not build dependencies.
+
+## Desktop
+
+- Aurora wallpaper by default; Graphite available in the wallpaper picker. Both original 3840 × 2160 PNGs are included unchanged.
+- Synterra Glass Plasma style: translucent blue glass, highlight edges, blur masks and Breeze fallback for controls.
+- Synterra Glass Aurorae window frames: glass borders, pale title text, glossy buttons and a red close button.
+- Bottom taskbar with launcher, pinned applications, tray, clock and Show Desktop.
+- Light application surfaces, blue selection colors, Noto Sans and Breeze icons. Wayland session, PipeWire audio, NetworkManager and VMware guest tools.
+
+## Build inside the Manjaro VM
+
+Allocate at least 4 vCPUs, 8 GB RAM and 35 GB of free space. Copy this folder into the VM (for example `~/synterra`); build on the guest's Linux filesystem, not directly on a VMware shared folder.
+
+The private GitHub repository is the preferred transfer method. Authenticate to GitHub in the guest using your own SSH key or HTTPS credential manager, then clone:
+
+```bash
+git clone https://github.com/realphoni/synterra.git ~/synterra
+cd ~/synterra
+sudo bash scripts/build-manjaro.sh
+```
+
+If an earlier failed copy created `~/synterra`, clone into `~/synterra-git` instead and build from that directory. GitHub account passwords do not work for HTTPS Git authentication; use a token through your credential manager, or an already-configured SSH key with `git@github.com:realphoni/synterra.git`. Do not put credentials in the clone URL.
+
+Host prerequisites: `bash`, `curl`, `gnupg`, `tar`, `zstd`, `util-linux`, and `/usr/share/pacman/keyrings/archlinux.gpg`. Install missing prerequisites using Manjaro's package manager. Do not replace Manjaro's repositories with Arch repositories.
+
+The existing Manjaro VM has a read-only VMware share named `Synterra` pointing to `E:\tuff`. If it is mounted at `/mnt/hgfs/Synterra`, copy it into the guest with `cp -a /mnt/hgfs/Synterra ~/synterra`. If the share is not mounted, open it through VMware shared folders or mount it with `sudo mkdir -p /mnt/hgfs` then `sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other`.
+
+```bash
+cd ~/synterra
+sudo bash scripts/build-manjaro.sh
+```
+
+The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
+
+On a native Arch build host with `archiso` installed:
+
+```bash
+sudo bash scripts/build-arch.sh
+```
+
+`ARCHISO_PROFILE` may select a local releng template. Each build uses a fresh profile and work directory to avoid stale archiso artifacts. Arch packages are rolling releases, so builds are not bit-for-bit reproducible without pinned package snapshots.
+
+## Test in VMware
+
+Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D acceleration enabled). Keep Manjaro as the builder. Verify:
+
+1. The live session enters Plasma automatically as `live`.
+2. Aurora is visible, the panel is at the bottom, and glass frames have working minimize/maximize/close buttons.
+3. Network, sound, resize, clipboard and the wallpaper picker work.
+4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
+5. Reboot and test BIOS boot as well as UEFI boot.
+
+The live account has no password; root administration is available through sudo. SSH is not enabled. This is a live development image, not a finished graphical installer. `archinstall` is included for advanced installation work; it does not automatically install Synterra's overlay. An installed-system workflow and release signing remain future work.
+
+## Files
+
+- `scripts/`: verified-bootstrap builder, Arch builder, profile generator and theme validator.
+- `profile/packages.txt`: extra packages layered onto upstream Arch releng.
+- `profile/airootfs/`: branding, live-session configuration and desktop defaults.
+- `assets/wallpapers/`: supplied originals, copied to the image during profile generation.
+- `docs/BUILD-STATUS.md`: actual validation and VMware status.
+
+## Upstream and licensing
+
+Uses [Archiso](https://wiki.archlinux.org/title/Archiso), [KDE Plasma styles](https://develop.kde.org/docs/plasma/theme/) and [Aurorae](https://develop.kde.org/docs/plasma/aurorae/). Synterra is an independent derivative; it is not an official Arch, Manjaro or Microsoft product. Original code and vector artwork in this repository are MIT licensed. Wallpaper ownership remains with their creator; their inclusion here does not grant redistribution rights. Upstream packages retain their own licenses.

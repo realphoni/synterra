@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="25" viewBox="0 0 300 25">
+<defs><linearGradient id="glass" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+<stop offset="0" stop-color="#eff8ff" stop-opacity=".70"/>
+<stop offset=".08" stop-color="#a7cbe9" stop-opacity=".65"/>
+<stop offset=".48" stop-color="#537eaf" stop-opacity=".58"/>
+<stop offset=".51" stop-color="#32537e" stop-opacity=".68"/>
+<stop offset="1" stop-color="#87afd3" stop-opacity=".72"/>
+</linearGradient></defs><g id="active-center" transform="translate(0,0)" opacity=".95">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#7194b8" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g><g id="inactive-center" transform="translate(50,0)" opacity=".55">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#7194b8" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g><g id="hover-center" transform="translate(100,0)" opacity=".95">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#6dccff" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g><g id="pressed-center" transform="translate(150,0)" opacity=".95">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#7194b8" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g><g id="hover-inactive-center" transform="translate(200,0)" opacity=".95">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#6dccff" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g><g id="pressed-inactive-center" transform="translate(250,0)" opacity=".95">
+<rect x="0" y="0" width="29" height="23" rx="3" fill="#7194b8" stroke="#e3f3ff" stroke-opacity=".65"/>
+<rect x="1" y="1" width="27" height="10" rx="2" fill="#ffffff" opacity=".25"/>
+<g stroke="#f8fcff" stroke-width="1.8" stroke-linecap="square"><path d="M10 17h10"/></g></g></svg>

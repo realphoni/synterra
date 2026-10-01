@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "Plasma/LookAndFeel",
+  "KPlugin": {
+    "Id": "org.synterra.glass.desktop",
+    "Name": "Synterra Glass",
+    "Description": "A luminous glass desktop for Synterra",
+    "Version": "0.1.0",
+    "License": "MIT",
+    "Authors": [{"Name": "Synterra contributors"}]
+  },
+  "X-Plasma-APIVersion": "2"
+}

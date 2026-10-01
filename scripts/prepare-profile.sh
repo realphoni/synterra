@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+dest=${1:?Usage: prepare-profile.sh NEW_OUTPUT_DIRECTORY}
+upstream=${ARCHISO_PROFILE:-/usr/share/archiso/configs/releng}
+[[ -f $upstream/profiledef.sh ]] || { echo 'Archiso releng profile missing.' >&2; exit 1; }
+[[ ! -e $dest ]] || { echo 'Profile destination must not already exist.' >&2; exit 1; }
+mkdir -p "$dest"
+cp -a "$upstream/." "$dest/"
+cp -a "$repo/profile/airootfs/." "$dest/airootfs/"
+grep -Ev '^\s*(#|$)' "$repo/profile/packages.txt" >> "$dest/packages.x86_64"
+sort -u "$dest/packages.x86_64" -o "$dest/packages.x86_64"
+# This file never consumes the host's (possibly Manjaro) repository config.
+cp "$repo/profile/pacman.conf" "$dest/pacman.conf"
+cp "$repo/profile/pacman.conf" "$dest/airootfs/etc/pacman.conf"
+mkdir -p "$dest/airootfs/etc/pacman.d"
+printf 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\n' > "$dest/airootfs/etc/pacman.d/mirrorlist"
+cat >> "$dest/profiledef.sh" <<'PROFILE'
+
+# Synterra overrides; retain upstream boot modes, initramfs and install_dir.
+iso_name="synterra"
+iso_label="SYNTERRA_$(date -u +%Y%m)"
+iso_publisher="Synterra"
+iso_application="Synterra Glass Live Desktop"
+iso_version="0.1.$(date -u +%Y%m%d)"
+file_permissions+=(
+  ["/usr/local/bin/synterra-live-setup"]="0:0:755"
+  ["/usr/local/bin/synterra-welcome"]="0:0:755"
+  ["/etc/sudoers.d/10-synterra-live"]="0:0:440"
+)
+PROFILE
+for variant in aurora graphite; do
+    wall="$dest/airootfs/usr/share/wallpapers/Synterra-$variant"
+    mkdir -p "$wall/contents/images"
+    cp "$repo/assets/wallpapers/Prism-$variant-4K.png" "$wall/contents/images/3840x2160.png"
+    printf '{"KPlugin":{"Id":"Synterra-%s","Name":"Synterra Prism %s","License":"LicenseRef-User-Supplied"}}\n' "$variant" "$variant" > "$wall/metadata.json"
+done
+system="$dest/airootfs/etc/systemd/system"
+mkdir -p "$system/multi-user.target.wants"
+# NetworkManager owns interfaces; keep resolved for releng's resolver symlink.
+for service in iwd sshd systemd-networkd choose-mirror; do
+    rm -f "$system/multi-user.target.wants/$service.service"
+done
+rm -f "$system/dbus-org.freedesktop.network1.service" \
+    "$system/sockets.target.wants/systemd-networkd.socket" \
+    "$system/network-online.target.wants/systemd-networkd-wait-online.service"
+ln -sfn /dev/null "$system/systemd-networkd.service"
+ln -sfn /dev/null "$system/systemd-networkd.socket"
+ln -sfn /usr/lib/systemd/system/NetworkManager.service "$system/multi-user.target.wants/NetworkManager.service"
+ln -sfn /usr/lib/systemd/system/vmtoolsd.service "$system/multi-user.target.wants/vmtoolsd.service"
+ln -sfn /etc/systemd/system/synterra-live-setup.service "$system/multi-user.target.wants/synterra-live-setup.service"
+ln -sfn /usr/lib/systemd/system/sddm.service "$system/display-manager.service"
+ln -sfn /usr/lib/systemd/system/graphical.target "$system/default.target"
+# Drop upstream root-console autologin; desktop autologin uses the live user.
+rm -f "$system/getty@tty1.service.d/autologin.conf"
+for bootdir in grub efiboot syslinux; do
+    if [[ -d $dest/$bootdir ]]; then
+        find "$dest/$bootdir" -type f \( -name '*.cfg' -o -name '*.conf' \) -exec sed -i 's/Arch Linux/Synterra/g' {} +
+    fi
+done
+echo "Prepared $dest"
