@@ -2,7 +2,35 @@
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
-**Status: development source; no ISO has been built or boot-tested yet.** The Manjaro VMware VM is the build host. Windows and WSL are not build dependencies.
+**Status: the first development ISO has been built successfully with Archiso in Arch Linux on WSL. Its SHA-256 checksum is verified; VMware boot and desktop testing remain pending.** Native Arch and the isolated Manjaro builder are also supported.
+
+## Download the live ISO
+
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 0.1 development release](https://github.com/realphoni/synterra/releases/tag/v0.1.20261001-alpha). The image is 2,460,696,576 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+
+On Linux, put all four files in one folder, then verify and join them:
+
+```bash
+sha256sum -c SHA256SUMS.parts
+cat synterra-0.1.20261001-x86_64.iso.part00 synterra-0.1.20261001-x86_64.iso.part01 > synterra-0.1.20261001-x86_64.iso
+sha256sum -c SHA256SUMS
+```
+
+On Windows, use Command Prompt to join the parts:
+
+```cmd
+copy /b synterra-0.1.20261001-x86_64.iso.part00+synterra-0.1.20261001-x86_64.iso.part01 synterra-0.1.20261001-x86_64.iso
+```
+
+Then check the assembled ISO in PowerShell:
+
+```powershell
+Get-FileHash .\synterra-0.1.20261001-x86_64.iso -Algorithm SHA256
+```
+
+Expected SHA-256: `01cbcdf48bf534657729d96732fce763ee9fd45c6ffafa3a7b070ff486eeeb56`.
+
+Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
 ## Desktop
 
@@ -15,6 +43,18 @@ An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma
 ## Build inside the Manjaro VM
 
 Allocate at least 4 vCPUs, 8 GB RAM and 35 GB of free space. Copy this folder into the VM (for example `~/synterra`); build on the guest's Linux filesystem, not directly on a VMware shared folder.
+
+## Build with WSL on this Windows workspace
+
+The first ISO was built using WSL 3.0.1 and a dedicated official Arch Linux distribution named `SynterraBuild`. The official Arch WSL image was downloaded and SHA-256 verified under `out/installers/`.
+
+On the configured Windows workspace, run `scripts/resume-wsl-build.ps1` from PowerShell. It registers `SynterraBuild` if needed (using the downloaded image), installs Arch's build dependencies, validates Synterra's source with Rust, runs Archiso on the distribution's Linux filesystem, and copies the ISO, checksums and logs to `E:\tuff\out`. New WSL installations may require a Windows restart before registration works. The helper assumes this workspace is at `E:\tuff`; native Arch and Manjaro instructions below are portable.
+
+```powershell
+& E:\tuff\scripts\resume-wsl-build.ps1
+```
+
+### Manjaro build instructions
 
 The public GitHub repository is the preferred transfer method. Clone over HTTPS; authentication is not required:
 

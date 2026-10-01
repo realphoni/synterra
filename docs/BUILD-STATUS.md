@@ -1,64 +1,29 @@
 # Build status — 2026-10-01
 
-## Rust utility migration
+The first Synterra development ISO was built successfully with Archiso in the dedicated Arch Linux WSL distribution `SynterraBuild`. WSL 3.0.1 is installed and operational.
 
-The project's three source utilities now live in the `synterra-tools` Rust executable: artwork generation, source validation and the bootstrap signature regression. The old source scripts were removed. Archiso orchestration remains Bash. Cargo dependencies are pinned in `Cargo.lock`; Rust/Cargo are included in the live image package manifest.
+- Image: `synterra-0.1.20261001-x86_64.iso`.
+- Size: 2,460,696,576 bytes.
+- SHA-256: `01cbcdf48bf534657729d96732fce763ee9fd45c6ffafa3a7b070ff486eeeb56`.
+- Copied from the Linux build filesystem to `E:\tuff\out`; verification of the copied ISO passed.
+- Rust source validation and package installation passed; Archiso completed ISO creation.
 
-Verified on Windows with the downloaded stable GNU Rust toolchain:
+The release contains two ISO parts because the full image exceeds GitHub's per-asset limit. `SHA256SUMS.parts` verifies the parts and `SHA256SUMS` verifies the assembled image. See the README for assembly instructions.
 
-- Cargo compilation succeeded.
-- Rust source validation passed.
-- The Rust GPG regression accepted a valid signature and rejected tampering.
-- Generated SVG geometry, palette values and desktop settings match all 13 previous assets/settings after ignoring formatting.
-- Updated Bash scripts passed parser checks.
-- The official x86_64 Linux rustup installer was downloaded under `out/installers/` and its SHA-256 matched Rust's published checksum. It is excluded from Git; `scripts/install-rust.sh` downloads the official installer in Manjaro.
+## Build corrections
 
-Rust is already installed on the Windows host. Rust installation and utility execution in the Manjaro guest remain user-run steps because guest command access requires authentication. The full ISO still needs to build and boot.
+Synterra's `os-release` is stored in `/usr/share/synterra/` and applied by a post-transaction pacman hook. This avoids a conflict with Arch's `filesystem` package during installation and reapplies branding on upgrades.
 
-## Bootstrap signature correction
+The Manjaro builder imports the armored Arch keyring into a temporary GPG home before verifying the bootstrap signature. Signature verification remains mandatory. The Rust GPG regression accepted a valid signature and rejected tampering.
 
-The first guest build downloaded the Arch bootstrap but stopped before extraction: `invalid packet (ctb=2d)` and `No public key`. The builder passed pacman's armored OpenPGP key file as a GPG database. It now imports that file into the temporary GPG home before verifying the detached signature. Signature verification remains mandatory.
+## Source validation
 
-Regression test passed locally with the existing GPG installation: an armored key file imports, a valid detached signature succeeds, and altered data fails. Bash syntax and source validation also passed. The corrected full build still needs to run in Manjaro.
+Artwork generation, source validation and the GPG regression passed using Rust on Windows. The Linux source validator passed during the WSL build. Dependencies are pinned in `Cargo.lock`; build orchestration uses Bash.
 
-The repository is now public. Existing clones can update using `git pull --ff-only`.
+The original Aurora and Graphite wallpapers remain unchanged at 3840 × 2160. The profile includes the Aero-inspired Plasma style, Aurorae frames, palette, launcher orb and bottom panel.
 
-```bash
-cargo run --locked -- test-bootstrap-signature
-```
+## Pending validation
 
-## Initial source validation
+The ISO has not been boot-tested. VMware BIOS/UEFI boot, Plasma autologin, desktop appearance, networking, audio, guest resize and clipboard still require testing. Compilation and source checks do not prove runtime behavior.
 
-Completed:
-
-- Arch-based source and isolated Manjaro-to-Arch bootstrap builder.
-- Original Plasma glass style, Aurorae window frames, palette, launcher orb and initial desktop layout.
-- Supplied Aurora and Graphite wallpapers copied intact; SHA-256 hashes match the originals; both are 3840 × 2160.
-- Bash parser checks passed for all five shell scripts (existing MSYS Bash, syntax only).
-- Source validator passed: JSON metadata, ten SVG assets, required frame and blur-mask IDs, PNG dimensions, Linux line endings, palette and package manifest.
-- Existing Manjaro VM started with VMware Workstation's `vmrun`; VMware Tools reports `running`.
-- Read-only `Synterra` source share added and enabled for the running VM session.
-
-Pending:
-
-- User will run the build command in the Manjaro guest. VMware guest commands require authentication; none was supplied or bypassed.
-- Full bootstrap/package resolution, archiso build, ISO boot, live desktop visuals and BIOS/UEFI validation have not run.
-- No ISO, installed-system image or graphical installer has been produced.
-
-Computer-use window inspection failed with `FrameArrived timed out: timed out waiting on channel`, then `window capture timed out: timed out waiting on channel`. Existing VMware CLI was used to start and inspect the VM instead. No WSL was installed or used.
-
-Validation commands:
-
-```bash
-cargo run --locked -- validate
-for f in scripts/*.sh profile/airootfs/usr/local/bin/*; do bash -n "$f"; done
-```
-
-Build in Manjaro after copying the source to `~/synterra`:
-
-```bash
-cd ~/synterra
-sudo bash scripts/build-manjaro.sh
-```
-
-Expected result: `~/synterra/out/synterra-*.iso`, build logs and `SHA256SUMS`. Source checks do not prove that the ISO builds or that the theme renders correctly in Plasma.
+This is a development live image. A finished graphical installer, installed-system workflow and release signing remain future work.
