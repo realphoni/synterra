@@ -95,7 +95,8 @@ pub fn install() -> Result {
         "packages": packages,
         "profile_config": {"profile": {"main": "Desktop", "details": ["KDE Plasma"]}, "gfx_driver": "All open-source", "greeter": "sddm"},
         "network_config": {"type": "nm"}, "audio_config": {"audio": "pipewire"},
-        "services": ["NetworkManager", "sddm", "vmtoolsd"],
+        // The selected Archinstall profile owns its greeter until finalization.
+        "services": ["NetworkManager", "vmtoolsd"],
         "custom_commands": ["touch /etc/synterra-install-ready"]
     });
     let config_path = format!("/run/synterra-install-{}.json", std::process::id());
@@ -159,6 +160,7 @@ pub fn install() -> Result {
         &[
             "--root",
             TARGET,
+            "--force",
             "enable",
             "NetworkManager",
             "sddm",
@@ -201,9 +203,30 @@ pub fn test() -> Result {
         "phoni:x:1000:1000::/home/phoni:/bin/bash",
     )?;
     assert_eq!(validate_target(&temp)?, vec!["phoni"]);
+    if std::env::consts::OS == "linux" {
+        let units = temp.join("usr/lib/systemd/system");
+        fs::create_dir_all(&units)?;
+        let unit = "[Unit]\nDescription=Installer regression fixture\n[Service]\nExecStart=/usr/bin/true\n[Install]\nAlias=display-manager.service\n";
+        fs::write(units.join("sddm.service"), unit)?;
+        fs::write(units.join("cosmic-greeter.service"), unit)?;
+        let root = temp.to_str().ok_or("Invalid test path")?;
+        command("systemctl", &["--root", root, "enable", "cosmic-greeter"])?;
+        let collision = Command::new("systemctl")
+            .args(["--root", root, "enable", "sddm"])
+            .output()?;
+        assert!(
+            !collision.status.success(),
+            "Fixture must reproduce the greeter collision"
+        );
+        command("systemctl", &["--root", root, "--force", "enable", "sddm"])?;
+        assert_eq!(
+            fs::read_link(temp.join("etc/systemd/system/display-manager.service"))?
+                .file_name()
+                .unwrap(),
+            "sddm.service"
+        );
+    }
     fs::remove_dir_all(temp)?;
-    println!(
-        "PASS: installer rejects incomplete targets, live-only accounts and unsafe home paths."
-    );
+    println!("PASS: installer target guards and COSMIC-to-SDDM alias conflict regression.");
     Ok(())
 }

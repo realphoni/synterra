@@ -20,3 +20,9 @@ A Rust installer is available from the desktop, application menu and welcome dia
 Rust compilation, source validation, shell parser checks and installer guard tests passed. Guard tests reject incomplete targets, live-only accounts and unsafe user-home paths. Installer arguments and NetworkManager presets were checked against the Archinstall version included in the image. Archiso completed package installation, initramfs generation, SquashFS compression and ISO creation. The supplied wallpapers remain unchanged.
 
 The user supplied a screenshot confirming the previous 0.1 live desktop booted in VMware. Prism 0.2's revised visuals and a full installation to a disposable virtual disk have not yet been tested. This is an experimental development image, and release signing remains future work.
+
+## Installer greeter fix — 2026-10-02
+
+A user install reported an SDDM alias collision with COSMIC's greeter. The Rust preset no longer separately enables SDDM during Archinstall's base phase. Finalization selects SDDM with an explicit forced alias update. A disposable-directory regression reproduced the original collision and verified the corrected login-service alias.
+
+`scripts/recover-install.sh` repairs an already mounted partial installation after checking its packages and EFI bootloader. It restores desktop defaults and fstab without partitioning or formatting. The helper's shell parser check and rejection outside the live environment passed. Recovery on the user's actual virtual disk has not been run by Codex. The published Prism 0.2 ISO remains unchanged; new source builds include the fix.

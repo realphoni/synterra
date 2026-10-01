@@ -109,6 +109,19 @@ Installed systems use the account you created. Live-session autologin, the live 
 
 Run `fastfetch` to display the custom blue/cyan/violet Synterra Prism logo. Defaults are installed through `/etc/skel/.config/fastfetch/config.jsonc`, and the logo lives at `/usr/share/synterra/fastfetch-logo.txt`.
 
+## Recover a Prism 0.2 greeter conflict
+
+The published 0.2 ISO can stop with `display-manager.service already exists ... cosmic-greeter.service` if Archinstall selected COSMIC's greeter. The installer source is corrected: the base stage leaves greeter selection to Archinstall, then Synterra finalization explicitly selects SDDM. The existing ISO assets have not been rebuilt with this fix.
+
+For an installation still mounted at `/mnt/synterra-install`, run this from a new terminal in the same live session:
+
+```bash
+curl -fL https://raw.githubusercontent.com/realphoni/synterra/main/scripts/recover-install.sh -o /tmp/synterra-recover.sh
+sudo bash /tmp/synterra-recover.sh
+```
+
+The helper checks the mounted root, installed packages and (on UEFI) the mounted EFI partition and bootloader. It asks you to type `REPAIR`, then restores Synterra's desktop, switches the login service to SDDM and generates fstab with a backup. If no regular user was created, it prompts for a new administrator account and password inside the VM. It does not partition or format disks. Wait for `Synterra recovery finished` before shutting down and removing the ISO. If it stops at a guard check, retain the live session and inspect the reported condition.
+
 ## Files
 
 - `scripts/`: verified-bootstrap builder, Arch builder, profile generator and theme validator.
