@@ -2,8 +2,6 @@
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
-**Status: the first development ISO has been built successfully with Archiso in Arch Linux on WSL. Its SHA-256 checksum is verified; VMware boot and desktop testing remain pending.** Native Arch and the isolated Manjaro builder are also supported.
-
 ## Download the live ISO
 
 Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 0.1 development release](https://github.com/realphoni/synterra/releases/tag/v0.1.20261001-alpha). The image is 2,460,696,576 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
