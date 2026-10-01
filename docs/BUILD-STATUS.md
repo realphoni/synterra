@@ -1,5 +1,20 @@
 # Build status — 2026-10-01
 
+## Rust utility migration
+
+The project's three source utilities now live in the `synterra-tools` Rust executable: artwork generation, source validation and the bootstrap signature regression. The old source scripts were removed. Archiso orchestration remains Bash. Cargo dependencies are pinned in `Cargo.lock`; Rust/Cargo are included in the live image package manifest.
+
+Verified on Windows with the downloaded stable GNU Rust toolchain:
+
+- Cargo compilation succeeded.
+- Rust source validation passed.
+- The Rust GPG regression accepted a valid signature and rejected tampering.
+- Generated SVG geometry, palette values and desktop settings match all 13 previous assets/settings after ignoring formatting.
+- Updated Bash scripts passed parser checks.
+- The official x86_64 Linux rustup installer was downloaded under `out/installers/` and its SHA-256 matched Rust's published checksum. It is excluded from Git; `scripts/install-rust.sh` downloads the official installer in Manjaro.
+
+Rust is already installed on the Windows host. Rust installation and utility execution in the Manjaro guest remain user-run steps because guest command access requires authentication. The full ISO still needs to build and boot.
+
 ## Bootstrap signature correction
 
 The first guest build downloaded the Arch bootstrap but stopped before extraction: `invalid packet (ctb=2d)` and `No public key`. The builder passed pacman's armored OpenPGP key file as a GPG database. It now imports that file into the temporary GPG home before verifying the detached signature. Signature verification remains mandatory.
@@ -9,7 +24,7 @@ Regression test passed locally with the existing GPG installation: an armored ke
 The repository is now public. Existing clones can update using `git pull --ff-only`.
 
 ```bash
-python scripts/test-bootstrap-signature.py
+cargo run --locked -- test-bootstrap-signature
 ```
 
 ## Initial source validation
@@ -35,7 +50,7 @@ Computer-use window inspection failed with `FrameArrived timed out: timed out wa
 Validation commands:
 
 ```bash
-python scripts/validate.py
+cargo run --locked -- validate
 for f in scripts/*.sh profile/airootfs/usr/local/bin/*; do bash -n "$f"; done
 ```
 

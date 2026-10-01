@@ -32,3 +32,5 @@ mesa
 sudo
 archinstall
 kdialog
+rust
+cargo

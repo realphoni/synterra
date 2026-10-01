@@ -27,7 +27,7 @@ rm -f "$root/etc/resolv.conf"
 cp -L /etc/resolv.conf "$root/etc/resolv.conf"
 printf 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\n' > "$root/etc/pacman.d/mirrorlist"
 mkdir -p "$root/root/synterra"
-tar -C "$repo" -cf - scripts profile assets README.md LICENSE .gitattributes | tar -C "$root/root/synterra" -xf -
+tar -C "$repo" -cf - scripts src Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes | tar -C "$root/root/synterra" -xf -
 mounted=()
 cleanup() {
     local i

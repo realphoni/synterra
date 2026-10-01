@@ -65,6 +65,27 @@ The live account has no password; root administration is available through sudo.
 - `assets/wallpapers/`: supplied originals, copied to the image during profile generation.
 - `docs/BUILD-STATUS.md`: actual validation and VMware status.
 
+## Rust development tools
+
+The project's artwork generator, source validator and bootstrap signature regression are Rust utilities in `src/`. Generated desktop assets are committed, so the ISO builder can use them directly. Archiso's build and mount orchestration remains Bash. The Synterra package manifest includes Rust and its Cargo provider; upstream desktop packages may still use their own language runtimes.
+
+In Manjaro, install Rust using the official rustup installer as your normal user:
+
+```bash
+bash scripts/install-rust.sh
+source "$HOME/.cargo/env"
+```
+
+A native linker is also required: install Manjaro's `base-devel` package group if it is missing. Run the utilities with the committed dependency lockfile:
+
+```bash
+cargo run --locked -- generate-artwork
+cargo run --locked -- validate
+cargo run --locked -- test-bootstrap-signature
+```
+
+The signature regression requires GPG and uses throwaway keys. Windows builds use Rust with Visual Studio's C++ tools; run Cargo from a Developer PowerShell or Developer Command Prompt so Microsoft's linker is selected.
+
 ## Upstream and licensing
 
 Uses [Archiso](https://wiki.archlinux.org/title/Archiso), [KDE Plasma styles](https://develop.kde.org/docs/plasma/theme/) and [Aurorae](https://develop.kde.org/docs/plasma/aurorae/). Synterra is an independent derivative; it is not an official Arch, Manjaro or Microsoft product. Original code and vector artwork in this repository are MIT licensed. Wallpaper ownership remains with their creator; their inclusion here does not grant redistribution rights. Upstream packages retain their own licenses.

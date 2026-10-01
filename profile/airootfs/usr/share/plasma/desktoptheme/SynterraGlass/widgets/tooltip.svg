@@ -13,7 +13,8 @@
 <rect id="right" x="57" y="7" width="7" height="50" fill="url(#glass)" opacity="1"/>
 <rect id="bottomleft" x="0" y="57" width="7" height="7" fill="url(#glass)" opacity="1"/>
 <rect id="bottom" x="7" y="57" width="50" height="7" fill="url(#glass)" opacity="1"/>
-<rect id="bottomright" x="57" y="57" width="7" height="7" fill="url(#glass)" opacity="1"/><rect id="mask-topleft" x="80" y="0" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="bottomright" x="57" y="57" width="7" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="mask-topleft" x="80" y="0" width="7" height="7" fill="#000000" opacity="1"/>
 <rect id="mask-top" x="87" y="0" width="50" height="7" fill="#000000" opacity="1"/>
 <rect id="mask-topright" x="137" y="0" width="7" height="7" fill="#000000" opacity="1"/>
 <rect id="mask-left" x="80" y="7" width="7" height="50" fill="#000000" opacity="1"/>
@@ -21,4 +22,5 @@
 <rect id="mask-right" x="137" y="7" width="7" height="50" fill="#000000" opacity="1"/>
 <rect id="mask-bottomleft" x="80" y="57" width="7" height="7" fill="#000000" opacity="1"/>
 <rect id="mask-bottom" x="87" y="57" width="50" height="7" fill="#000000" opacity="1"/>
-<rect id="mask-bottomright" x="137" y="57" width="7" height="7" fill="#000000" opacity="1"/><rect id="hint-stretch-borders" x="0" y="75" width="1" height="1"/><rect id="hint-top-margin" x="10" y="75" width="7" height="7"/><rect id="hint-bottom-margin" x="10" y="75" width="7" height="7"/><rect id="hint-left-margin" x="10" y="75" width="7" height="7"/><rect id="hint-right-margin" x="10" y="75" width="7" height="7"/></svg>
+<rect id="mask-bottomright" x="137" y="57" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="hint-stretch-borders" x="0" y="75" width="1" height="1"/><rect id="hint-top-margin" x="10" y="75" width="7" height="7"/><rect id="hint-bottom-margin" x="10" y="75" width="7" height="7"/><rect id="hint-left-margin" x="10" y="75" width="7" height="7"/><rect id="hint-right-margin" x="10" y="75" width="7" height="7"/></svg>
