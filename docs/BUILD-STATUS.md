@@ -1,5 +1,19 @@
 # Build status — 2026-10-01
 
+## Bootstrap signature correction
+
+The first guest build downloaded the Arch bootstrap but stopped before extraction: `invalid packet (ctb=2d)` and `No public key`. The builder passed pacman's armored OpenPGP key file as a GPG database. It now imports that file into the temporary GPG home before verifying the detached signature. Signature verification remains mandatory.
+
+Regression test passed locally with the existing GPG installation: an armored key file imports, a valid detached signature succeeds, and altered data fails. Bash syntax and source validation also passed. The corrected full build still needs to run in Manjaro.
+
+The repository is now public. Existing clones can update using `git pull --ff-only`.
+
+```bash
+python scripts/test-bootstrap-signature.py
+```
+
+## Initial source validation
+
 Completed:
 
 - Arch-based source and isolated Manjaro-to-Arch bootstrap builder.

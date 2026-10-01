@@ -18,7 +18,10 @@ base=https://geo.mirror.pkgbuild.com/iso/latest
 archive=archlinux-bootstrap-x86_64.tar.zst
 curl --fail --location --retry 3 "$base/$archive" -o "$build/$archive"
 curl --fail --location --retry 3 "$base/$archive.sig" -o "$build/$archive.sig"
-gpg --homedir "$build/gnupg" --no-default-keyring --keyring "$keyring" --verify "$build/$archive.sig" "$build/$archive"
+# Pacman's key file may be ASCII-armored OpenPGP data, not a GPG database.
+# Import into our isolated key database before verifying; never modify the host's.
+gpg --no-options --homedir "$build/gnupg" --batch --import "$keyring"
+gpg --no-options --homedir "$build/gnupg" --batch --verify "$build/$archive.sig" "$build/$archive"
 tar --zstd -xpf "$build/$archive" -C "$build"
 rm -f "$root/etc/resolv.conf"
 cp -L /etc/resolv.conf "$root/etc/resolv.conf"

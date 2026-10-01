@@ -16,7 +16,7 @@ An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma
 
 Allocate at least 4 vCPUs, 8 GB RAM and 35 GB of free space. Copy this folder into the VM (for example `~/synterra`); build on the guest's Linux filesystem, not directly on a VMware shared folder.
 
-The private GitHub repository is the preferred transfer method. Authenticate to GitHub in the guest using your own SSH key or HTTPS credential manager, then clone:
+The public GitHub repository is the preferred transfer method. Clone over HTTPS; authentication is not required:
 
 ```bash
 git clone https://github.com/realphoni/synterra.git ~/synterra
@@ -24,7 +24,7 @@ cd ~/synterra
 sudo bash scripts/build-manjaro.sh
 ```
 
-If an earlier failed copy created `~/synterra`, clone into `~/synterra-git` instead and build from that directory. GitHub account passwords do not work for HTTPS Git authentication; use a token through your credential manager, or an already-configured SSH key with `git@github.com:realphoni/synterra.git`. Do not put credentials in the clone URL.
+If an earlier failed copy created `~/synterra`, clone into `~/synterra-git` instead and build from that directory. To update an existing clone, run `git pull --ff-only` there before building.
 
 Host prerequisites: `bash`, `curl`, `gnupg`, `tar`, `zstd`, `util-linux`, and `/usr/share/pacman/keyrings/archlinux.gpg`. Install missing prerequisites using Manjaro's package manager. Do not replace Manjaro's repositories with Arch repositories.
 
