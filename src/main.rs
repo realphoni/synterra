@@ -1,4 +1,5 @@
 mod artwork;
+mod installer;
 mod signature;
 mod validate;
 
@@ -18,8 +19,10 @@ fn run() -> Result {
         Some("generate-artwork") => artwork::generate(root),
         Some("validate") => validate::validate(root),
         Some("test-bootstrap-signature") => signature::test(),
+        Some("install") => installer::install(),
+        Some("test-installer") => installer::test(),
         _ => Err(
-            "Usage: cargo run --locked -- <generate-artwork|validate|test-bootstrap-signature>"
+            "Usage: synterra-tools <generate-artwork|validate|test-bootstrap-signature|install|test-installer>"
                 .into(),
         ),
     }

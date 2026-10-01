@@ -10,5 +10,5 @@ mkdir -p "$repo/build" "$repo/out"
 run=$(mktemp -d "$repo/build/$stamp.XXXXXX")
 bash "$repo/scripts/prepare-profile.sh" "$run/profile"
 mkarchiso -v -w "$run/work" -o "$repo/out" "$run/profile" 2>&1 | tee "$repo/out/build-$stamp.log"
-find "$repo/out" -maxdepth 1 -name 'synterra-*.iso' -type f -exec sha256sum {} \; > "$repo/out/SHA256SUMS"
+(cd "$repo/out" && sha256sum synterra-*.iso > SHA256SUMS)
 echo "Synterra ISO and checksums: $repo/out"

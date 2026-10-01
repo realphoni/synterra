@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Install Synterra Indev
+Comment=Guided installation of Synterra Indev (Prism 0.2)
+Exec=synterra-install
+Icon=synterra
+Categories=System;
+StartupNotify=true

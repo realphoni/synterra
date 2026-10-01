@@ -34,3 +34,4 @@ archinstall
 kdialog
 rust
 cargo
+fastfetch

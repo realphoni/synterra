@@ -32,7 +32,7 @@ pub fn validate(repo: &Path) -> Result {
     let mut svgs = 0;
     for path in &all {
         let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
-        if ext == "json" {
+        if ext == "json" || ext == "jsonc" {
             serde_json::from_slice::<serde_json::Value>(&fs::read(path)?)?;
         }
         if ext != "svg" {

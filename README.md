@@ -1,32 +1,32 @@
-# Synterra
+# Synterra Indev (Prism 0.2)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 0.1 development release](https://github.com/realphoni/synterra/releases/tag/v0.1.20261001-alpha). The image is 2,460,696,576 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.2 release](https://github.com/realphoni/synterra/releases/tag/v0.2.20261001-alpha). The image is 2,462,842,880 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-0.1.20261001-x86_64.iso.part00 synterra-0.1.20261001-x86_64.iso.part01 > synterra-0.1.20261001-x86_64.iso
+cat synterra-0.2.20261001-x86_64.iso.part00 synterra-0.2.20261001-x86_64.iso.part01 > synterra-0.2.20261001-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-0.1.20261001-x86_64.iso.part00+synterra-0.1.20261001-x86_64.iso.part01 synterra-0.1.20261001-x86_64.iso
+copy /b synterra-0.2.20261001-x86_64.iso.part00+synterra-0.2.20261001-x86_64.iso.part01 synterra-0.2.20261001-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-0.1.20261001-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-0.2.20261001-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `01cbcdf48bf534657729d96732fce763ee9fd45c6ffafa3a7b070ff486eeeb56`.
+Expected SHA-256: `bd1496231ccc93a6d63df3c3452eb28930928d1ad22c125dfa26a93eadf94721`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
@@ -34,7 +34,7 @@ Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The part
 
 - Aurora wallpaper by default; Graphite available in the wallpaper picker. Both original 3840 × 2160 PNGs are included unchanged.
 - Synterra Glass Plasma style: translucent blue glass, highlight edges, blur masks and Breeze fallback for controls.
-- Synterra Glass Aurorae window frames: glass borders, pale title text, glossy buttons and a red close button.
+- Synterra Glass Aurorae window frames: smooth translucent side borders, pale title text, glossy buttons and a red close button.
 - Bottom taskbar with launcher, pinned applications, tray, clock and Show Desktop.
 - Light application surfaces, blue selection colors, Noto Sans and Breeze icons. Wayland session, PipeWire audio, NetworkManager and VMware guest tools.
 
@@ -75,7 +75,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host with `archiso` installed:
+On a native Arch build host with `archiso`, `rust` and `gcc` installed:
 
 ```bash
 sudo bash scripts/build-arch.sh
@@ -93,7 +93,21 @@ Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D a
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
 5. Reboot and test BIOS boot as well as UEFI boot.
 
-The live account has no password; root administration is available through sudo. SSH is not enabled. This is a live development image, not a finished graphical installer. `archinstall` is included for advanced installation work; it does not automatically install Synterra's overlay. An installed-system workflow and release signing remain future work.
+The live account has no password; root administration is available through sudo. SSH is not enabled. The Rust installer wraps Archinstall and applies Synterra's desktop to the installed system. It uses a terminal wizard rather than a graphical partition editor. Release signing remains future work.
+
+## Install Synterra
+
+Open **Install Synterra Indev** from the desktop or application menu. The Rust launcher starts Archinstall's guided terminal interface with KDE Plasma, Synterra's packages and NetworkManager selected. Connect to the internet first; installation downloads packages from Arch mirrors.
+
+Choose the target disk, partition layout, timezone, bootloader and a regular administrator account with a password. Review the disk summary before confirming: formatting erases existing data. Keep the KDE profile and Synterra package list selected.
+
+**At Archinstall's completion screen choose Exit, not Reboot.** The wrapper then copies Synterra's theme, wallpapers, Fastfetch logo and user defaults, applies branding and enables the desktop services. Wait for **Synterra installation finished**, then shut down, eject the live ISO and boot from the installed disk.
+
+Installed systems use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. This installer is experimental; a full installation on a disposable VM disk still needs validation.
+
+## Fastfetch
+
+Run `fastfetch` to display the custom blue/cyan/violet Synterra Prism logo. Defaults are installed through `/etc/skel/.config/fastfetch/config.jsonc`, and the logo lives at `/usr/share/synterra/fastfetch-logo.txt`.
 
 ## Files
 
@@ -120,6 +134,7 @@ A native linker is also required: install Manjaro's `base-devel` package group i
 cargo run --locked -- generate-artwork
 cargo run --locked -- validate
 cargo run --locked -- test-bootstrap-signature
+cargo run --locked -- test-installer
 ```
 
 The signature regression requires GPG and uses throwaway keys. Windows builds use Rust with Visual Studio's C++ tools; run Cargo from a Developer PowerShell or Developer Command Prompt so Microsoft's linker is selected.
@@ -127,3 +142,4 @@ The signature regression requires GPG and uses throwaway keys. Windows builds us
 ## Upstream and licensing
 
 Uses [Archiso](https://wiki.archlinux.org/title/Archiso), [KDE Plasma styles](https://develop.kde.org/docs/plasma/theme/) and [Aurorae](https://develop.kde.org/docs/plasma/aurorae/). Synterra is an independent derivative; it is not an official Arch, Manjaro or Microsoft product. Original code and vector artwork in this repository are MIT licensed. Wallpaper ownership remains with their creator; their inclusion here does not grant redistribution rights. Upstream packages retain their own licenses.
+

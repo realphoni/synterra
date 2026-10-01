@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec kdialog --title 'Welcome to Synterra' --msgbox 'Synterra 0.1 · Prism\n\nAn Arch desktop through glass.\n\nOpen applications from the Synterra orb at the lower left. Change Aurora or Graphite in Desktop and Wallpaper settings.\n\nThis is a live development session. Changes disappear after reboot. A complete installed-system workflow is still in development.'
+if kdialog --title 'Synterra Indev (Prism 0.2)' --yesno 'Welcome to Synterra Indev (Prism 0.2).\n\nOpen applications from the Synterra orb. Aurora and Graphite are available in Desktop and Wallpaper settings.\n\nInstall Synterra opens the Arch guided installer, then applies this desktop to your installed system. Connect to the internet first. At the final Archinstall screen choose EXIT so Synterra can finish.\n\nStart the installer now?' --yes-label 'Install Synterra' --no-label 'Explore desktop'; then
+    exec synterra-install
+fi

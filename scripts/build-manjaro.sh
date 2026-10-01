@@ -46,7 +46,7 @@ mount -t tmpfs tmpfs "$root/run"; mounted+=("$root/run")
 chroot "$root" /bin/bash -euxc '
     pacman-key --init
     pacman-key --populate archlinux
-    pacman -Syu --noconfirm archlinux-keyring archiso
+    pacman -Syu --noconfirm archlinux-keyring archiso rust gcc
     bash /root/synterra/scripts/build-arch.sh
 '
 cp -a "$root/root/synterra/out/." "$repo/out/"

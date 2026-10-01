@@ -16,7 +16,7 @@ done
 rm -f "$repo/profile/airootfs/usr/lib/os-release"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh

@@ -24,8 +24,26 @@ fn frame(prefix: &str, offset: i32, opacity: &str, mask: bool, title: i32) -> St
         } else {
             format!("{prefix}-{part}")
         };
-        let fill = if mask { "#000000" } else { "url(#glass)" };
-        result.push_str(&format!(r#"<rect id="{id}" x="{}" y="{y}" width="{w}" height="{h}" fill="{fill}" opacity="{opacity}"/>"#, x+offset));
+        // A vertical titlebar gradient repeats in each tiled side segment.
+        // Keep the gloss on horizontal edges and a uniform tint on the sides.
+        let smooth_edge = title > 7 && !matches!(part, "top" | "topleft" | "topright");
+        let fill = if mask {
+            "#000000"
+        } else if smooth_edge {
+            "#7897b4"
+        } else {
+            "url(#glass)"
+        };
+        let alpha = if !mask && smooth_edge {
+            if opacity == "1" {
+                "0.58"
+            } else {
+                "0.38"
+            }
+        } else {
+            opacity
+        };
+        result.push_str(&format!(r#"<rect id="{id}" x="{}" y="{y}" width="{w}" height="{h}" fill="{fill}" opacity="{alpha}"/>"#, x+offset));
         result.push('\n');
     }
     result

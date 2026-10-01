@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Install Synterra Indev
+Exec=synterra-install
+Icon=synterra
+Categories=System;

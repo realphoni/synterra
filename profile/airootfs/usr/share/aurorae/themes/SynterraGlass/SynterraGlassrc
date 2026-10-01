@@ -14,9 +14,9 @@ RightButtons=IAX
 Shadow=false
 
 [Layout]
-BorderLeft=7
-BorderRight=7
-BorderBottom=7
+BorderLeft=4
+BorderRight=4
+BorderBottom=4
 TitleEdgeTop=3
 TitleEdgeBottom=3
 TitleEdgeLeft=7

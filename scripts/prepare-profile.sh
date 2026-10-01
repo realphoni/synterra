@@ -8,6 +8,22 @@ upstream=${ARCHISO_PROFILE:-/usr/share/archiso/configs/releng}
 mkdir -p "$dest"
 cp -a "$upstream/." "$dest/"
 cp -a "$repo/profile/airootfs/." "$dest/airootfs/"
+command -v cargo >/dev/null || { echo 'Install Rust and Cargo on the Arch build host.' >&2; exit 1; }
+cargo build --manifest-path "$repo/Cargo.toml" --locked --release
+install -Dm755 "$repo/target/release/synterra-tools" "$dest/airootfs/usr/local/libexec/synterra-tools"
+# Installer payload contains desktop defaults, not live accounts/autologin.
+payload="$dest/airootfs/usr/share/synterra/install-overlay"
+mkdir -p "$payload/etc/skel" "$payload/usr/share"
+cp -a "$repo/profile/airootfs/etc/skel/." "$payload/etc/skel/"
+rm -f "$payload/etc/skel/.config/autostart/synterra-welcome.desktop"
+rm -rf "$payload/etc/skel/Desktop"
+for item in plasma aurorae color-schemes icons; do
+    cp -a "$repo/profile/airootfs/usr/share/$item" "$payload/usr/share/"
+done
+install -Dm644 "$repo/profile/airootfs/usr/share/synterra/os-release" "$payload/usr/share/synterra/os-release"
+install -Dm644 "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt" "$payload/usr/share/synterra/fastfetch-logo.txt"
+install -Dm644 "$repo/profile/airootfs/usr/share/libalpm/hooks/90-synterra-branding.hook" "$payload/usr/share/libalpm/hooks/90-synterra-branding.hook"
+cp "$repo/profile/packages.txt" "$dest/airootfs/usr/share/synterra/install-packages.txt"
 grep -Ev '^\s*(#|$)' "$repo/profile/packages.txt" >> "$dest/packages.x86_64"
 sort -u "$dest/packages.x86_64" -o "$dest/packages.x86_64"
 # This file never consumes the host's (possibly Manjaro) repository config.
@@ -22,10 +38,12 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="0.1.$(date -u +%Y%m%d)"
+iso_version="0.2.$(date -u +%Y%m%d)"
 file_permissions+=(
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
+  ["/usr/local/bin/synterra-install"]="0:0:755"
+  ["/usr/local/libexec/synterra-tools"]="0:0:755"
   ["/etc/sudoers.d/10-synterra-live"]="0:0:440"
 )
 PROFILE
@@ -35,6 +53,8 @@ for variant in aurora graphite; do
     cp "$repo/assets/wallpapers/Prism-$variant-4K.png" "$wall/contents/images/3840x2160.png"
     printf '{"KPlugin":{"Id":"Synterra-%s","Name":"Synterra Prism %s","License":"LicenseRef-User-Supplied"}}\n' "$variant" "$variant" > "$wall/metadata.json"
 done
+mkdir -p "$payload/usr/share/wallpapers"
+cp -a "$dest/airootfs/usr/share/wallpapers/Synterra-aurora" "$dest/airootfs/usr/share/wallpapers/Synterra-graphite" "$payload/usr/share/wallpapers/"
 system="$dest/airootfs/etc/systemd/system"
 mkdir -p "$system/multi-user.target.wants"
 # NetworkManager owns interfaces; keep resolved for releng's resolver symlink.
