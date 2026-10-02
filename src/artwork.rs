@@ -38,7 +38,7 @@ fn frame(prefix: &str, offset: i32, opacity: &str, mask: bool, title: i32) -> St
             if opacity == "1" {
                 "0.58"
             } else {
-                "0.38"
+                "0.48"
             }
         } else {
             opacity

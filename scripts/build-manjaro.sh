@@ -27,7 +27,7 @@ rm -f "$root/etc/resolv.conf"
 cp -L /etc/resolv.conf "$root/etc/resolv.conf"
 printf 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\n' > "$root/etc/pacman.d/mirrorlist"
 mkdir -p "$root/root/synterra"
-tar -C "$repo" -cf - scripts src Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes | tar -C "$root/root/synterra" -xf -
+tar -C "$repo" -cf - scripts src browser Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes | tar -C "$root/root/synterra" -xf -
 mounted=()
 cleanup() {
     local i
@@ -46,7 +46,7 @@ mount -t tmpfs tmpfs "$root/run"; mounted+=("$root/run")
 chroot "$root" /bin/bash -euxc '
     pacman-key --init
     pacman-key --populate archlinux
-    pacman -Syu --noconfirm archlinux-keyring archiso rust gcc
+    pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine
     bash /root/synterra/scripts/build-arch.sh
 '
 cp -a "$root/root/synterra/out/." "$repo/out/"

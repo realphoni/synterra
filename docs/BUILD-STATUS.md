@@ -1,22 +1,24 @@
 # Build status — 2026-10-02
 
-Synterra Indev (Prism 0.3) built successfully with Archiso in `SynterraBuild`.
+Synterra Indev (Prism 0.4) built successfully with Archiso in `SynterraBuild`.
 
-- Image: `synterra-0.3.20261002-x86_64.iso`.
-- Size: 2,526,052,352 bytes.
-- SHA-256: `f510a0ebff1f8c174888911c67fa5b56bdf5cd1e58cf9e2863a5cac77b8555c4`.
-- Release: two ISO parts, whole-image checksum and part checksums.
+- Image: `synterra-0.4.20261002-x86_64.iso`.
+- Size: 2,627,321,856 bytes.
+- SHA-256: `6bd6316c11cc20acfabff072ac97aab849e459af293687e07e6eec8d7fa8d0a0`.
+- Prepared assets: two ISO parts, whole-image and part checksums, plus a separate Surf update archive and checksum.
 
-## Prism 0.3
+## Prism 0.4
 
-Synterra Surf replaces Firefox. It is a native C++/Qt WebEngine browser with tabs, bookmarks, downloads, zoom and an original local start page. Surf is included in both the live desktop and installed-system payload, with default HTTP/HTTPS associations and a taskbar launcher. Spectacle and Gwenview are included, alongside the Aero-inspired desktop, wallpapers and custom Fastfetch logo.
+Surf now includes private windows, searchable local history, find-in-page, reopen-closed-tab, optional session restoration, favicons, dark-toolbar settings and a download manager with progress/cancel/folder controls. Address parsing supports ports with paths and IPv6. Session restoration is off by default. History keeps 200 recent pages, sessions at most 30 tabs, and saved URLs strip credentials. Private profiles do not save Surf history or sessions; explicit bookmarks and downloads still persist.
 
-The installer includes the COSMIC-to-SDDM alias fix. Archinstall no longer separately enables SDDM during its base phase; Synterra finalization explicitly selects SDDM with a forced alias update. Choose Exit at Archinstall's completion screen and wait for Synterra finalization before rebooting. The guarded recovery helper is built into the live application menu.
+Okular, VLC with its media plugins, and Filelight join the existing desktop applications. Default PDF and common media associations are included. Surf is available in both the live and installed-system payloads, and a separate browser archive supports updating existing Synterra installations.
 
 ## Validation
 
-Rust compilation, source validation, shell parser checks and installer guard/regression tests passed. The installer regression recreated a COSMIC greeter alias and verified the SDDM replacement in a disposable directory. Browser URL/search tests passed; its local start page rendered and passed DOM checks under an unprivileged user with Chromium's sandbox enabled. The rendered browser screenshot was visually inspected.
+Native browser compilation and source/installer regression checks passed. Tests verify URL normalization, history deduplication/cap, credential stripping, saved-settings persistence, allowed session URLs and private isolation. A sandboxed browser test under an unprivileged user rendered the start page, exercised Ctrl+F and actual find matches, checked tab closure and an off-the-record profile, and downloaded a local HTTP fixture with correct contents and completion state. Its screenshot was visually inspected.
 
-Archiso completed package installation, initramfs, SquashFS and ISO creation. The compressed installer payload was checked for Surf's executable permissions. The supplied wallpapers remain unchanged.
+The new packages were confirmed in the staged ISO filesystem, where Surf's self-tests also passed. Archiso completed package installation, initramfs, SquashFS and ISO creation. Both live and installer-payload Surf executables have executable permissions inside the compressed image. The original wallpapers remain unchanged.
 
-Prior user screenshots confirm live VMware boots. This 0.3 ISO has not yet been boot-tested or installed to a disposable virtual disk. Broad website compatibility and interactive browser download/permission flows need manual testing. Release signing remains future work.
+This ISO has not been boot-tested or installed to a disposable VM disk. Broad website compatibility, download cancellation/close confirmation, settings/history dialogs and desktop file associations still need manual testing. Release signing remains future work.
+
+The installer retains the tested COSMIC-to-SDDM repair and guarded recovery menu entry. Choose Exit after Archinstall completes and wait for Synterra finalization before rebooting.

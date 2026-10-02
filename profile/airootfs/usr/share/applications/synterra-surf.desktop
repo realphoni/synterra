@@ -9,3 +9,8 @@ Categories=Network;WebBrowser;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;
 StartupNotify=true
 StartupWMClass=SynterraSurf
+Actions=Private;
+
+[Desktop Action Private]
+Name=New Private Window
+Exec=synterra-surf --private

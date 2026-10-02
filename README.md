@@ -1,49 +1,77 @@
-# Synterra Indev (Prism 0.3)
+# Synterra Indev (Prism 0.4)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.3 release](https://github.com/realphoni/synterra/releases/tag/v0.3.20261002-alpha). The image is 2,526,052,352 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.4 release](https://github.com/realphoni/synterra/releases/tag/v0.4.20261002-alpha). The image is 2,627,321,856 bytes (about 2.45 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-0.3.20261002-x86_64.iso.part00 synterra-0.3.20261002-x86_64.iso.part01 > synterra-0.3.20261002-x86_64.iso
+cat synterra-0.4.20261002-x86_64.iso.part00 synterra-0.4.20261002-x86_64.iso.part01 > synterra-0.4.20261002-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-0.3.20261002-x86_64.iso.part00+synterra-0.3.20261002-x86_64.iso.part01 synterra-0.3.20261002-x86_64.iso
+copy /b synterra-0.4.20261002-x86_64.iso.part00+synterra-0.4.20261002-x86_64.iso.part01 synterra-0.4.20261002-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-0.3.20261002-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-0.4.20261002-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `f510a0ebff1f8c174888911c67fa5b56bdf5cd1e58cf9e2863a5cac77b8555c4`.
+Expected SHA-256: `6bd6316c11cc20acfabff072ac97aab849e459af293687e07e6eec8d7fa8d0a0`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Prism 0.3
+## New in Prism 0.4
 
-- **Synterra Surf** replaces Firefox as the default web browser and taskbar launcher. It has tabs, address/search navigation, bookmarks, downloads, zoom shortcuts and an original Synterra start page.
-- **Spectacle** captures screenshots and **Gwenview** opens images.
-- The installer includes the tested COSMIC-to-SDDM greeter fix. **Repair Synterra Installation** is also available in the live application menu, so recovery no longer requires downloading a helper.
-- The smooth glass borders, original wallpapers and custom Fastfetch logo continue from Prism 0.2.
+- **Synterra Surf** gains private windows, searchable browsing history, find-in-page, reopen-closed-tab, optional session restoration, favicons and a dark-toolbar setting.
+- Downloads now have a progress window with cancellation and folder access. Closing a window with active downloads asks before cancelling them.
+- Improved address parsing supports ports with paths and IPv6 addresses. Saved history and sessions strip URL credentials; history keeps up to 200 recent pages.
+- **Okular** opens PDFs, **VLC** plays media and **Filelight** visualizes disk usage. Spectacle and Gwenview remain included.
+- Aero-inspired desktop, custom Fastfetch logo, original wallpapers and installer recovery continue from previous releases.
 
 ## Synterra Surf
 
-Surf is a native C++/Qt application using Arch's `qt6-webengine` package for its Chromium-based rendering engine. Its source is in `browser/`; it is compiled with CMake and Ninja during ISO preparation and included in both the live image and installed-system payload. Upstream engine updates come from Arch's packages.
+Surf is a native C++/Qt application using Arch's `qt6-webengine` package for its Chromium rendering engine. Its source is in `browser/`; CMake and Ninja compile it into both the live image and installed-system payload. Arch updates supply the engine.
 
-Use Ctrl+L for the address bar, Ctrl+T for a new tab, Ctrl+W to close a tab, Ctrl+R to reload, and Ctrl++ / Ctrl+- to zoom. The Bookmarks menu saves pages locally. Downloads ask where to save; the Downloads button opens the download folder. Web addresses use HTTPS by default and searches use DuckDuckGo. Website permissions ask before access is granted; certificate validation and the engine sandbox retain their defaults.
+Use the Menu button for history, settings and private windows. Session restoration is off by default; enable it in Settings to save up to 30 open web tabs when the window closes. History is saved locally and can be searched or cleared from its dialog. Bookmarks from earlier Surf versions are retained.
 
-This is an early browser. Extensions, a password manager, session restoration and Firefox profile migration are not implemented. Source tests verify address normalization and search encoding; a sandboxed engine smoke test rendered and checked the local start page. Broad website compatibility and interactive download/permission flows still need manual testing.
+| Shortcut | Action |
+| --- | --- |
+| Ctrl+L / Ctrl+T / Ctrl+W | Address bar / new tab / close tab |
+| Ctrl+Shift+T / Ctrl+Shift+N | Reopen closed tab / private window |
+| Ctrl+F / Escape | Find in page / close find bar or stop loading |
+| Ctrl+H / Ctrl+J / Ctrl+D | History / downloads / bookmarks |
+| Ctrl+R / Alt+Left / Alt+Right | Reload / back / forward |
+| Ctrl++ / Ctrl+- / Ctrl+0 | Zoom in / zoom out / reset zoom |
+
+Private windows use a separate [Qt off-the-record profile](https://doc.qt.io/qt-6/qwebengineprofile.html#QWebEngineProfile), with memory-only cookies/cache and no Surf history or session persistence. Downloads and explicitly saved bookmarks remain on disk. Private browsing does not hide traffic from websites or network operators. Website permissions still ask, and normal certificate validation and Chromium sandboxing stay enabled.
+
+Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Tests cover address parsing, history limits/deduplication, credential stripping, session/private isolation, actual page rendering, Ctrl+F/find results, tab closure and an HTTP download fixture. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
+
+### Update Surf on an existing Synterra installation
+
+Download `synterra-surf-0.4.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the Prism 0.4 release. Verify and extract, close Surf, then run these commands from the extracted directory:
+
+```bash
+sha256sum -c SHA256SUMS.surf
+tar -xzf synterra-surf-0.4.0-linux-x86_64.tar.gz
+cd synterra-surf-0.4.0-linux-x86_64
+sudo pacman -Syu qt6-webengine qt6-base
+sudo install -Dm755 synterra-surf /usr/local/bin/synterra-surf
+sudo install -Dm644 synterra-surf.desktop /usr/share/applications/synterra-surf.desktop
+sudo install -Dm644 synterra-surf.svg /usr/share/icons/hicolor/scalable/apps/synterra-surf.svg
+```
+
+The archive targets current x86_64 Arch/Synterra systems. It requires Qt libraries and is not a standalone Windows executable. Existing profiles and bookmarks are retained. Build the archive locally with `bash scripts/package-surf.sh` after compiling Surf.
 
 ## Desktop
 

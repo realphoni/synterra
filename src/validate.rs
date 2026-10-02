@@ -133,12 +133,23 @@ pub fn validate(repo: &Path) -> Result {
         "aurorae",
         "rust",
         "cargo",
+        "qt6-webengine",
+        "spectacle",
+        "gwenview",
+        "okular",
+        "vlc",
+        "vlc-plugins-all",
+        "filelight",
     ] {
         require(
             unique.contains(package),
             format!("Missing package: {package}"),
         )?;
     }
+    require(
+        !unique.contains("firefox"),
+        "Firefox must be replaced by Synterra Surf",
+    )?;
     println!("PASS: JSON metadata, {svgs} SVGs and blur masks, 4K wallpapers, LF scripts, palette and package manifest.");
     Ok(())
 }

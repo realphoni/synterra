@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if kdialog --title 'Synterra Indev (Prism 0.3)' --yesno 'Welcome to Synterra Indev (Prism 0.3).\n\nSynterra Surf is your new browser, pinned to the taskbar. Take screenshots with Spectacle and open images in Gwenview. Aurora and Graphite are available in Desktop and Wallpaper settings.\n\nThe guided installer applies this desktop to your installed system. Connect to the internet first. At the final Archinstall screen choose EXIT so Synterra can finish.\n\nStart the installer now?' --yes-label 'Install Synterra' --no-label 'Explore desktop'; then
+if kdialog --title 'Synterra Indev (Prism 0.4)' --yesno 'Welcome to Synterra Indev (Prism 0.4).\n\nSynterra Surf now has private windows, find-in-page, history, downloads and optional session restore. Open PDFs in Okular, play media in VLC and explore disk usage with Filelight. Spectacle and Gwenview are also included. Aurora and Graphite are available in Desktop and Wallpaper settings.\n\nThe guided installer applies this desktop to your installed system. Connect to the internet first. At the final Archinstall screen choose EXIT so Synterra can finish.\n\nStart the installer now?' --yes-label 'Install Synterra' --no-label 'Explore desktop'; then
     exec synterra-install
 fi

@@ -1,9 +1,9 @@
 NAME="Synterra Indev"
-PRETTY_NAME="Synterra Indev (Prism 0.3)"
+PRETTY_NAME="Synterra Indev (Prism 0.4)"
 ID=synterra
 ID_LIKE=arch
-VERSION_ID=0.3
-VERSION="Prism 0.3"
+VERSION_ID=0.4
+VERSION="Prism 0.4"
 BUILD_ID=development
 ANSI_COLOR="38;2;125;183;255"
 LOGO=synterra

@@ -19,6 +19,10 @@ ark
 qt6-webengine
 spectacle
 gwenview
+okular
+vlc
+vlc-plugins-all
+filelight
 xdg-desktop-portal-kde
 xdg-user-dirs
 networkmanager
