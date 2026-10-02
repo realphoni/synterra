@@ -11,6 +11,11 @@ cp -a "$repo/profile/airootfs/." "$dest/airootfs/"
 command -v cargo >/dev/null || { echo 'Install Rust and Cargo on the Arch build host.' >&2; exit 1; }
 cargo build --manifest-path "$repo/Cargo.toml" --locked --release
 install -Dm755 "$repo/target/release/synterra-tools" "$dest/airootfs/usr/local/libexec/synterra-tools"
+cmake -S "$repo/browser" -B "$repo/target/surf" -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build "$repo/target/surf" --parallel 2
+"$repo/target/surf/synterra-surf" --self-test
+install -Dm755 "$repo/target/surf/synterra-surf" "$dest/airootfs/usr/local/bin/synterra-surf"
+install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libexec/synterra-recover"
 # Installer payload contains desktop defaults, not live accounts/autologin.
 payload="$dest/airootfs/usr/share/synterra/install-overlay"
 mkdir -p "$payload/etc/skel" "$payload/usr/share"
@@ -23,6 +28,8 @@ done
 install -Dm644 "$repo/profile/airootfs/usr/share/synterra/os-release" "$payload/usr/share/synterra/os-release"
 install -Dm644 "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt" "$payload/usr/share/synterra/fastfetch-logo.txt"
 install -Dm644 "$repo/profile/airootfs/usr/share/libalpm/hooks/90-synterra-branding.hook" "$payload/usr/share/libalpm/hooks/90-synterra-branding.hook"
+install -Dm755 "$repo/target/surf/synterra-surf" "$payload/usr/local/bin/synterra-surf"
+install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-surf.desktop" "$payload/usr/share/applications/synterra-surf.desktop"
 cp "$repo/profile/packages.txt" "$dest/airootfs/usr/share/synterra/install-packages.txt"
 grep -Ev '^\s*(#|$)' "$repo/profile/packages.txt" >> "$dest/packages.x86_64"
 sort -u "$dest/packages.x86_64" -o "$dest/packages.x86_64"
@@ -38,12 +45,15 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="0.2.$(date -u +%Y%m%d)"
+iso_version="0.3.$(date -u +%Y%m%d)"
 file_permissions+=(
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
   ["/usr/local/bin/synterra-install"]="0:0:755"
   ["/usr/local/libexec/synterra-tools"]="0:0:755"
+  ["/usr/local/bin/synterra-surf"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-surf"]="0:0:755"
+  ["/usr/local/libexec/synterra-recover"]="0:0:755"
   ["/etc/sudoers.d/10-synterra-live"]="0:0:440"
 )
 PROFILE

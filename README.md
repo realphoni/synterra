@@ -1,34 +1,49 @@
-# Synterra Indev (Prism 0.2)
+# Synterra Indev (Prism 0.3)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.2 release](https://github.com/realphoni/synterra/releases/tag/v0.2.20261001-alpha). The image is 2,462,842,880 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.3 release](https://github.com/realphoni/synterra/releases/tag/v0.3.20261002-alpha). The image is 2,526,052,352 bytes (about 2.3 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-0.2.20261001-x86_64.iso.part00 synterra-0.2.20261001-x86_64.iso.part01 > synterra-0.2.20261001-x86_64.iso
+cat synterra-0.3.20261002-x86_64.iso.part00 synterra-0.3.20261002-x86_64.iso.part01 > synterra-0.3.20261002-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-0.2.20261001-x86_64.iso.part00+synterra-0.2.20261001-x86_64.iso.part01 synterra-0.2.20261001-x86_64.iso
+copy /b synterra-0.3.20261002-x86_64.iso.part00+synterra-0.3.20261002-x86_64.iso.part01 synterra-0.3.20261002-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-0.2.20261001-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-0.3.20261002-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `bd1496231ccc93a6d63df3c3452eb28930928d1ad22c125dfa26a93eadf94721`.
+Expected SHA-256: `f510a0ebff1f8c174888911c67fa5b56bdf5cd1e58cf9e2863a5cac77b8555c4`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
+
+## New in Prism 0.3
+
+- **Synterra Surf** replaces Firefox as the default web browser and taskbar launcher. It has tabs, address/search navigation, bookmarks, downloads, zoom shortcuts and an original Synterra start page.
+- **Spectacle** captures screenshots and **Gwenview** opens images.
+- The installer includes the tested COSMIC-to-SDDM greeter fix. **Repair Synterra Installation** is also available in the live application menu, so recovery no longer requires downloading a helper.
+- The smooth glass borders, original wallpapers and custom Fastfetch logo continue from Prism 0.2.
+
+## Synterra Surf
+
+Surf is a native C++/Qt application using Arch's `qt6-webengine` package for its Chromium-based rendering engine. Its source is in `browser/`; it is compiled with CMake and Ninja during ISO preparation and included in both the live image and installed-system payload. Upstream engine updates come from Arch's packages.
+
+Use Ctrl+L for the address bar, Ctrl+T for a new tab, Ctrl+W to close a tab, Ctrl+R to reload, and Ctrl++ / Ctrl+- to zoom. The Bookmarks menu saves pages locally. Downloads ask where to save; the Downloads button opens the download folder. Web addresses use HTTPS by default and searches use DuckDuckGo. Website permissions ask before access is granted; certificate validation and the engine sandbox retain their defaults.
+
+This is an early browser. Extensions, a password manager, session restoration and Firefox profile migration are not implemented. Source tests verify address normalization and search encoding; a sandboxed engine smoke test rendered and checked the local start page. Broad website compatibility and interactive download/permission flows still need manual testing.
 
 ## Desktop
 
@@ -75,7 +90,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host with `archiso`, `rust` and `gcc` installed:
+On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf` and `qt6-webengine` installed:
 
 ```bash
 sudo bash scripts/build-arch.sh

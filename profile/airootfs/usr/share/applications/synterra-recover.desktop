@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Repair Synterra Installation
+Comment=Finish a mounted partial installation without formatting
+Exec=konsole --hold -e sudo bash /usr/local/libexec/synterra-recover
+Icon=system-software-install
+Categories=System;
+StartupNotify=true

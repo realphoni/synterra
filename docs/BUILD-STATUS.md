@@ -1,28 +1,22 @@
 # Build status — 2026-10-02
 
-Synterra Indev (Prism 0.2) was built successfully with Archiso in the Arch WSL distribution `SynterraBuild`. The filename uses the UTC build date.
+Synterra Indev (Prism 0.3) built successfully with Archiso in `SynterraBuild`.
 
-- Image: `synterra-0.2.20261001-x86_64.iso`.
-- Size: 2,462,842,880 bytes.
-- SHA-256: `bd1496231ccc93a6d63df3c3452eb28930928d1ad22c125dfa26a93eadf94721`.
-- Release: two ISO parts, plus whole-image and part checksums.
+- Image: `synterra-0.3.20261002-x86_64.iso`.
+- Size: 2,526,052,352 bytes.
+- SHA-256: `f510a0ebff1f8c174888911c67fa5b56bdf5cd1e58cf9e2863a5cac77b8555c4`.
+- Release: two ISO parts, whole-image checksum and part checksums.
 
-## Prism 0.2 changes
+## Prism 0.3
 
-Window sides and bottom edges now use a uniform translucent tint rather than repeating the titlebar gradient. Side and bottom border widths are reduced from seven to four pixels. The glossy titlebar is retained.
+Synterra Surf replaces Firefox. It is a native C++/Qt WebEngine browser with tabs, bookmarks, downloads, zoom and an original local start page. Surf is included in both the live desktop and installed-system payload, with default HTTP/HTTPS associations and a taskbar launcher. Spectacle and Gwenview are included, alongside the Aero-inspired desktop, wallpapers and custom Fastfetch logo.
 
-Fastfetch includes a custom blue/cyan/violet Synterra Prism logo and per-user defaults. Fastfetch was executed in the built filesystem and displayed the logo and `Synterra Indev (Prism 0.2)` successfully.
-
-A Rust installer is available from the desktop, application menu and welcome dialog. It opens Archinstall's guided interface with KDE Plasma and Synterra packages selected. On successful completion it applies an installation payload containing the theme, wallpapers, Fastfetch settings and user defaults. The installed payload excludes the live account, live autologin, welcome autostart and passwordless sudo. Users must choose Exit at the Archinstall completion screen so Synterra can finalize before rebooting.
+The installer includes the COSMIC-to-SDDM alias fix. Archinstall no longer separately enables SDDM during its base phase; Synterra finalization explicitly selects SDDM with a forced alias update. Choose Exit at Archinstall's completion screen and wait for Synterra finalization before rebooting. The guarded recovery helper is built into the live application menu.
 
 ## Validation
 
-Rust compilation, source validation, shell parser checks and installer guard tests passed. Guard tests reject incomplete targets, live-only accounts and unsafe user-home paths. Installer arguments and NetworkManager presets were checked against the Archinstall version included in the image. Archiso completed package installation, initramfs generation, SquashFS compression and ISO creation. The supplied wallpapers remain unchanged.
+Rust compilation, source validation, shell parser checks and installer guard/regression tests passed. The installer regression recreated a COSMIC greeter alias and verified the SDDM replacement in a disposable directory. Browser URL/search tests passed; its local start page rendered and passed DOM checks under an unprivileged user with Chromium's sandbox enabled. The rendered browser screenshot was visually inspected.
 
-The user supplied a screenshot confirming the previous 0.1 live desktop booted in VMware. Prism 0.2's revised visuals and a full installation to a disposable virtual disk have not yet been tested. This is an experimental development image, and release signing remains future work.
+Archiso completed package installation, initramfs, SquashFS and ISO creation. The compressed installer payload was checked for Surf's executable permissions. The supplied wallpapers remain unchanged.
 
-## Installer greeter fix — 2026-10-02
-
-A user install reported an SDDM alias collision with COSMIC's greeter. The Rust preset no longer separately enables SDDM during Archinstall's base phase. Finalization selects SDDM with an explicit forced alias update. A disposable-directory regression reproduced the original collision and verified the corrected login-service alias.
-
-`scripts/recover-install.sh` repairs an already mounted partial installation after checking its packages and EFI bootloader. It restores desktop defaults and fstab without partitioning or formatting. The helper's shell parser check and rejection outside the live environment passed. Recovery on the user's actual virtual disk has not been run by Codex. The published Prism 0.2 ISO remains unchanged; new source builds include the fix.
+Prior user screenshots confirm live VMware boots. This 0.3 ISO has not yet been boot-tested or installed to a disposable virtual disk. Broad website compatibility and interactive browser download/permission flows need manual testing. Release signing remains future work.

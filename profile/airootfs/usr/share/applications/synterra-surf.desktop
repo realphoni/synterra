@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Synterra Surf
+GenericName=Web Browser
+Comment=Browse the web with Synterra Surf
+Exec=synterra-surf %U
+Icon=synterra-surf
+Categories=Network;WebBrowser;
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+StartupWMClass=SynterraSurf

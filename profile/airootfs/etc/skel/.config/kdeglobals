@@ -97,6 +97,7 @@ ForegroundPositive=34,128,91
 ForegroundVisited=112,78,168
 
 [General]
+BrowserApplication=synterra-surf.desktop
 ColorScheme=SynterraGlass
 fixed=Noto Sans Mono,10,-1,5,50,0,0,0,0,0
 font=Noto Sans,10,-1,5,50,0,0,0,0,0

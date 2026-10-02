@@ -9,14 +9,14 @@ destination=${2:-/mnt/e/tuff/out}
 repo=/root/synterra
 mkdir -p "$repo" "$destination"
 # Build on the Linux filesystem; do not put archiso working files on DrvFS.
-for item in scripts src Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
+for item in scripts src browser Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
     cp -a "$source_dir/$item" "$repo/"
 done
 # Remove the obsolete pre-install branding overlay from earlier source copies.
 rm -f "$repo/profile/airootfs/usr/lib/os-release"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust gcc
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh

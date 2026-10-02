@@ -30,22 +30,7 @@ fn native(gpg: &Path, path: &Path) -> Result<String> {
 
 fn run(gpg: &Path, home: &Path, args: &[&str], check: bool) -> Result<Output> {
     let output = Command::new(gpg)
-        .args(["--no-options", "--homedir", &native(gpg, home)?, "--batch"])
-        .args(args)
-        .output()?;
-    if check && !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).into_owned().into());
-    }
-    Ok(output)
-}
-
-pub fn test() -> Result {
-    let gpg = executable("gpg")?;
-    let test_parent = Path::new(env!("CARGO_MANIFEST_DIR")).join("out");
-    fs::create_dir_all(&test_parent)?;
-    let stamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)?
-        .as_nanos();
+        .args(["--no-options", "--homedirn        .as_nanos();
     let temp = test_parent.join(format!("gpg-test-{}-{stamp}", std::process::id()));
     fs::create_dir(&temp)?;
     let signer = temp.join("signer");
@@ -81,20 +66,7 @@ pub fn test() -> Result {
         if !exported.starts_with(b"-----BEGIN PGP PUBLIC KEY BLOCK-----") {
             return Err("Expected armored public key".into());
         }
-        fs::write(&key, exported)?;
-        let archive = temp.join("bootstrap.fixture");
-        let signature = temp.join("bootstrap.fixture.sig");
-        fs::write(&archive, b"Synterra bootstrap regression fixture\n")?;
-        let key_arg = native(&gpg, &key)?;
-        let archive_arg = native(&gpg, &archive)?;
-        let sig_arg = native(&gpg, &signature)?;
-        run(
-            &gpg,
-            &signer,
-            &[
-                "--pinentry-mode",
-                "loopback",
-                "--passphrase",
+        fs::write(       "--passphrase",
                 "",
                 "--output",
                 &sig_arg,
@@ -103,13 +75,7 @@ pub fn test() -> Result {
             ],
             true,
         )?;
-        run(&gpg, &verifier, &["--import", &key_arg], true)?;
-        run(&gpg, &verifier, &["--verify", &sig_arg, &archive_arg], true)?;
-        fs::write(&archive, b"Tampered bootstrap fixture\n")?;
-        if run(
-            &gpg,
-            &verifier,
-            &["--verify", &sig_arg, &archive_arg],
+        run(&gpg, &verifier, &["-erify", &sig_arg, &archive_arg],
             false,
         )?
         .status
@@ -123,15 +89,60 @@ pub fn test() -> Result {
     if let Ok(gpgconf) = executable("gpgconf") {
         for home in [&signer, &verifier] {
             let _ = Command::new(&gpgconf)
-                .args(["--homedir", &native(&gpg, home)?, "--kill", "all"])
-                .output();
+                .args(["--homedir", &native(&gpg, s(&path, output)?;
+        } else if path.is_file() {
+            output.push(path);
         }
     }
-    // Remove only the freshly-created test directory within the project's out/.
-    let resolved = temp.canonicalize()?;
-    if resolved.parent() != Some(test_parent.canonicalize()?.as_path()) {
-        return Err("Refusing to clean a test directory outside out/".into());
+    Ok(())
+}
+
+fn require(condition: bool, message: impl Into<String>) -> Result {
+    if condition {
+        Ok(())
+    } else {
+        Err(me",
+                "topright",
+                "bottomleft",
+                "bottomright",
+            ] {
+                require(
+                    ids.contains(part) && ids.contains(format!("mask-{part}").as_str()),
+                              "Missing decoration frame/mask",
+            )?;
+        }
+        if matches!(
+            name.as_ref(),
+            "close.svg" | "maximize.svg" | "minimize.svg" | "restore.svg"
+        ) {
+            require(
+                ids.contains("active-center") && ids.contains("hover-center"),
+                "Missing button states",
+            )?;
+        }
+        svgs += 1;
     }
-    fs::remove_dir_all(resolved)?;
-    result
+    for name in ["aurora", "graphite"] {
+        let data = fs::read(repo.join(f      !data.contains(&b'\r') && data.starts_with(b"#!/usr/bin/env bash\n"),
+                format!(
+                    "Invalid Linux script line endings/shebang: {}",
+                    path.display()
+                ),
+            )?;
+    & !s.starts_with('#'))
+        .collect();
+    let unique: HashSet<_> = packages.iter().copied().collect();
+    require(unique.len() == packages.len(), "Duplicate packages")?;
+    for package in [
+        "plasma-desktop",
+        "sddm",
+    package: {package}"),
+        )?;
+    }
+    require(
+        !unique.contains("firefox"),
+        "Firefox must be replaced by Synterra Surf",
+    )?;
+    println!("PASS: JSON metadata, {svgs} SVGs and blur masks, 4K wallpapers, LF scripts, palette and package manifest.");
+    Ok(())
 }

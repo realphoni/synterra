@@ -16,7 +16,9 @@ dolphin
 konsole
 kate
 ark
-firefox
+qt6-webengine
+spectacle
+gwenview
 xdg-desktop-portal-kde
 xdg-user-dirs
 networkmanager

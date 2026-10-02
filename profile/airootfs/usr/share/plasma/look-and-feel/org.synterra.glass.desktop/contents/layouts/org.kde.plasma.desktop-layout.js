@@ -8,7 +8,7 @@ launcher.currentConfigGroup = ['General'];
 launcher.writeConfig('icon', 'synterra');
 var tasks = panel.addWidget('org.kde.plasma.icontasks');
 tasks.currentConfigGroup = ['General'];
-tasks.writeConfig('launchers', 'applications:org.kde.dolphin.desktop,applications:firefox.desktop,applications:org.kde.konsole.desktop,applications:systemsettings.desktop');
+tasks.writeConfig('launchers', 'applications:org.kde.dolphin.desktop,applications:synterra-surf.desktop,applications:org.kde.konsole.desktop,applications:systemsettings.desktop');
 panel.addWidget('org.kde.plasma.systemtray');
 var clock = panel.addWidget('org.kde.plasma.digitalclock');
 clock.currentConfigGroup = ['Appearance'];

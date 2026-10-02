@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.21)
+project(synterra_surf VERSION 0.3.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets WebEngineWidgets)
+qt_add_executable(synterra-surf main.cpp)
+qt_add_resources(synterra-surf surf_resources PREFIX /surf FILES start.html)
+target_link_libraries(synterra-surf PRIVATE Qt6::Widgets Qt6::WebEngineWidgets)
+install(TARGETS synterra-surf RUNTIME DESTINATION bin)
