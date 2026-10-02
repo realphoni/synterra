@@ -1,0 +1,39 @@
+# Synterra Prism: original Aero-inspired GRUB theme.
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "#14233f"
+terminal-font: "Synterra Regular 16"
+terminal-left: "8%"
+terminal-top: "12%"
+terminal-width: "84%"
+terminal-height: "70%"
+
++ image { left = 8% top = 8% width = 76 height = 76 file = "logo.png" }
++ label { left = 8%+96 top = 9% width = 70% height = 44 text = "Synterra" font = "Synterra Regular 32" color = "#f1f8ff" }
++ label { left = 8%+98 top = 9%+48 width = 70% height = 24 text = "INDEV / PRISM 0.5" font = "Synterra Regular 16" color = "#c9dff5" }
++ label { left = 8% top = 27% width = 84% height = 30 text = "Welcome home." font = "Synterra Regular 24" color = "#e7f4ff" }
++ boot_menu {
+  left = 8% top = 35% width = 84% height = 44%
+  item_font = "Synterra Regular 18"
+  selected_item_font = "Synterra Regular 18"
+  item_color = "#cddff3"
+  selected_item_color = "#ffffff"
+  item_height = 42
+  item_padding = 10
+    item_spacing = 20
+  icon_width = 0
+  icon_height = 0
+  menu_pixmap_style = "panel_*.png"
+  selected_item_pixmap_style = "selected_*.png"
+}
++ progress_bar {
+  id = "__timeout__"
+  left = 8% top = 84% width = 84% height = 26
+  font = "Synterra Regular 16"
+  text = "Booting the selected entry in %d seconds"
+  text_color = "#ffffff"
+  fg_color = "#579ed5"
+  bg_color = "#253b5b"
+  border_color = "#a7cfea"
+}
++ label { left = 8% top = 93% width = 84% height = 24 text = "Arrow keys: choose   Enter: boot   E: edit   C: console" font = "Synterra Regular 16" color = "#c7d9ee" }

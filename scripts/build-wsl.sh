@@ -14,11 +14,13 @@ for item in scripts src browser Cargo.toml Cargo.lock profile assets README.md L
 done
 # Remove the obsolete pre-install branding overlay from earlier source copies.
 rm -f "$repo/profile/airootfs/usr/lib/os-release"
+rm -f "$repo/profile/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
+    "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine grub librsvg ttf-dejavu
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh
-find "$repo/out" -maxdepth 1 -type f \( -name '*.iso' -o -name '*.log' -o -name SHA256SUMS \) -exec cp -v {} "$destination/" \;
+find "$repo/out" -maxdepth 1 -type f \( -name '*.iso' -o -name '*.log' -o -name SHA256SUMS \) -exec cp -uv {} "$destination/" \;
 echo "Synterra ISO copied to $destination"

@@ -140,6 +140,7 @@ pub fn validate(repo: &Path) -> Result {
         "vlc",
         "vlc-plugins-all",
         "filelight",
+        "grub",
     ] {
         require(
             unique.contains(package),
@@ -149,6 +150,18 @@ pub fn validate(repo: &Path) -> Result {
     require(
         !unique.contains("firefox"),
         "Firefox must be replaced by Synterra Surf",
+    )?;
+    require(
+        !root
+            .join("etc/skel/.config/fastfetch/config.jsonc")
+            .exists()
+            && !root.join("usr/share/synterra/fastfetch-logo.txt").exists(),
+        "The custom Fastfetch branding must be removed",
+    )?;
+    let grub_theme = fs::read_to_string(repo.join("assets/grub/theme.txt"))?;
+    require(
+        grub_theme.contains("+ boot_menu") && grub_theme.contains("__timeout__"),
+        "Missing GRUB menu/countdown",
     )?;
     println!("PASS: JSON metadata, {svgs} SVGs and blur masks, 4K wallpapers, LF scripts, palette and package manifest.");
     Ok(())

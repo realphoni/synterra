@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ $EUID == 0 ]] || { echo 'Run with sudo inside the installed Synterra system.' >&2; exit 1; }
+target=/
+stage_only=false
+if [[ $# == 2 && $1 == --stage-only ]]; then
+    target=$(realpath -e -- "$2")
+    [[ $target != / ]] || { echo 'Stage-only mode requires a separate target directory.' >&2; exit 1; }
+    stage_only=true
+elif (( $# != 0 )); then
+    echo 'Usage: synterra-grub-setup [--stage-only TARGET]' >&2; exit 1
+fi
+theme="$target/usr/share/grub/themes/SynterraPrism"
+boot="$target/boot/grub/themes/SynterraPrism"
+[[ -f $target/usr/share/synterra/os-release ]] && grep -qx 'ID=synterra' "$target/usr/share/synterra/os-release" || { echo 'This target is not Synterra.' >&2; exit 1; }
+[[ -f $target/boot/grub/grub.cfg && -f $theme/theme.txt ]] || { echo 'A configured GRUB installation and Synterra theme are required.' >&2; exit 1; }
+[[ ! -L $boot ]] || { echo 'Refusing a symlinked theme directory.' >&2; exit 1; }
+mkdir -p "$boot" "$target/etc/default/grub.d" "$target/etc/grub.d"
+# Copy without Unix ownership preservation: /boot may be a FAT EFI partition.
+cp -R "$theme/." "$boot/"
+cat > "$target/etc/default/grub.d/10-synterra.cfg" <<'CONFIG'
+GRUB_THEME="/boot/grub/themes/SynterraPrism/theme.txt"
+GRUB_GFXMODE="1280x720,1024x768,800x600,auto"
+GRUB_GFXPAYLOAD_LINUX=keep
+GRUB_TERMINAL_OUTPUT=gfxterm
+GRUB_FONT="/boot/grub/themes/SynterraPrism/synterra-16.pf2"
+GRUB_TIMEOUT_STYLE=menu
+GRUB_TIMEOUT=8
+CONFIG
+cat > "$target/etc/grub.d/06_synterra_fonts" <<'FONTS'
+#!/bin/sh
+# Only emit GRUB commands; keep existing kernel, encryption and disk options.
+cat <<'GRUB'
+for size in 16 18 24 32; do
+    loadfont "$prefix/themes/SynterraPrism/synterra-$size.pf2"
+done
+GRUB
+FONTS
+chmod 755 "$target/etc/grub.d/06_synterra_fonts"
+if ! $stage_only; then
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
+echo 'Synterra GRUB splash configured.'

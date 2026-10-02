@@ -297,7 +297,7 @@ public:
         menu->addSeparator();
         menu->addAction("Settings", this, [this] { preferences(); })->setEnabled(!privateMode);
         menu->addAction("About Surf", this, [this] {
-            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>Indev · Prism 0.4</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
+            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>Indev · Prism 0.5</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
         });
         applyStyle();
         connect(address, &QLineEdit::returnPressed, this, [this] { navigate(); });

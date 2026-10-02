@@ -1,42 +1,49 @@
-# Synterra Indev (Prism 0.4)
+# Synterra Indev (Prism 0.5)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.4 release](https://github.com/realphoni/synterra/releases/tag/v0.4.20261002-alpha). The image is 2,627,321,856 bytes (about 2.45 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.5 release](https://github.com/realphoni/synterra/releases/tag/v0.5.20261002-alpha). The image is 2,398,257,152 bytes (about 2.23 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-0.4.20261002-x86_64.iso.part00 synterra-0.4.20261002-x86_64.iso.part01 > synterra-0.4.20261002-x86_64.iso
+cat synterra-0.5.20261002-x86_64.iso.part00 synterra-0.5.20261002-x86_64.iso.part01 > synterra-0.5.20261002-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-0.4.20261002-x86_64.iso.part00+synterra-0.4.20261002-x86_64.iso.part01 synterra-0.4.20261002-x86_64.iso
+copy /b synterra-0.5.20261002-x86_64.iso.part00+synterra-0.5.20261002-x86_64.iso.part01 synterra-0.5.20261002-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-0.4.20261002-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-0.5.20261002-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `6bd6316c11cc20acfabff072ac97aab849e459af293687e07e6eec8d7fa8d0a0`.
+Expected SHA-256: `11d6e6d684d696f7006beb768ed0cefecc688832eddd7b4ab62acb0204e6cf52`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Prism 0.4
+## New in Prism 0.5
+
+- **Synterra GRUB splash:** original Aurora wallpaper, Synterra orb, glass selection and a visible boot countdown.
+- UEFI live images now boot through GRUB. Legacy BIOS live images retain Archiso's Syslinux menu.
+- The installer selects GRUB by default and configures the same splash on installed systems. Its managed theme settings preserve existing kernel and encryption options.
+- The custom Fastfetch logo and preset have been removed. Standard `fastfetch` remains available.
+
+## Included from Prism 0.4
 
 - **Synterra Surf** gains private windows, searchable browsing history, find-in-page, reopen-closed-tab, optional session restoration, favicons and a dark-toolbar setting.
 - Downloads now have a progress window with cancellation and folder access. Closing a window with active downloads asks before cancelling them.
 - Improved address parsing supports ports with paths and IPv6 addresses. Saved history and sessions strip URL credentials; history keeps up to 200 recent pages.
 - **Okular** opens PDFs, **VLC** plays media and **Filelight** visualizes disk usage. Spectacle and Gwenview remain included.
-- Aero-inspired desktop, custom Fastfetch logo, original wallpapers and installer recovery continue from previous releases.
+- Aero-inspired desktop, original wallpapers and installer recovery continue from previous releases.
 
 ## Synterra Surf
 
@@ -118,7 +125,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf` and `qt6-webengine` installed:
+On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `grub`, `librsvg` and `ttf-dejavu` installed:
 
 ```bash
 sudo bash scripts/build-arch.sh
@@ -134,7 +141,7 @@ Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D a
 2. Aurora is visible, the panel is at the bottom, and glass frames have working minimize/maximize/close buttons.
 3. Network, sound, resize, clipboard and the wallpaper picker work.
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
-5. Reboot and test BIOS boot as well as UEFI boot.
+5. Verify the Synterra GRUB splash on UEFI. Reboot and test the Syslinux fallback on BIOS.
 
 The live account has no password; root administration is available through sudo. SSH is not enabled. The Rust installer wraps Archinstall and applies Synterra's desktop to the installed system. It uses a terminal wizard rather than a graphical partition editor. Release signing remains future work.
 
@@ -142,15 +149,17 @@ The live account has no password; root administration is available through sudo.
 
 Open **Install Synterra Indev** from the desktop or application menu. The Rust launcher starts Archinstall's guided terminal interface with KDE Plasma, Synterra's packages and NetworkManager selected. Connect to the internet first; installation downloads packages from Arch mirrors.
 
-Choose the target disk, partition layout, timezone, bootloader and a regular administrator account with a password. Review the disk summary before confirming: formatting erases existing data. Keep the KDE profile and Synterra package list selected.
+Choose the target disk, partition layout, timezone, bootloader and a regular administrator account with a password. GRUB is selected by default; retain it for the Synterra splash. Other bootloaders do not display the GRUB theme. Review the disk summary before confirming: formatting erases existing data. Keep the KDE profile and Synterra package list selected.
 
-**At Archinstall's completion screen choose Exit, not Reboot.** The wrapper then copies Synterra's theme, wallpapers, Fastfetch logo and user defaults, applies branding and enables the desktop services. Wait for **Synterra installation finished**, then shut down, eject the live ISO and boot from the installed disk.
+**At Archinstall's completion screen choose Exit, not Reboot.** The wrapper then copies Synterra's desktop and GRUB themes, wallpapers and user defaults, applies branding and enables the desktop services. Wait for **Synterra installation finished**, then shut down, eject the live ISO and boot from the installed disk.
 
 Installed systems use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. This installer is experimental; a full installation on a disposable VM disk still needs validation.
 
-## Fastfetch
+## GRUB splash
 
-Run `fastfetch` to display the custom blue/cyan/violet Synterra Prism logo. Defaults are installed through `/etc/skel/.config/fastfetch/config.jsonc`, and the logo lives at `/usr/share/synterra/fastfetch-logo.txt`.
+The splash uses your original Aurora wallpaper unchanged. Arrow keys select an entry; Enter boots, E edits and C opens GRUB's console. Theme sources live in `assets/grub/`; the builder generates fonts and glass frame PNGs using GRUB and librsvg.
+
+Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, including when `/boot` is separate from an encrypted root. Settings live in `/etc/default/grub.d/10-synterra.cfg`; `/etc/default/grub` retains its existing disk and kernel options. To refresh the theme on an installed Prism 0.5 GRUB system, run `sudo /usr/local/libexec/synterra-grub-setup`.
 
 ## Recover a Prism 0.2 greeter conflict
 
@@ -171,6 +180,7 @@ The helper checks the mounted root, installed packages and (on UEFI) the mounted
 - `profile/packages.txt`: extra packages layered onto upstream Arch releng.
 - `profile/airootfs/`: branding, live-session configuration and desktop defaults.
 - `assets/wallpapers/`: supplied originals, copied to the image during profile generation.
+- `assets/grub/`: boot splash layout and live GRUB loader.
 - `docs/BUILD-STATUS.md`: actual validation and VMware status.
 
 ## Rust development tools

@@ -1,8 +1,0 @@
-{
-  "logo": {
-    "type": "file",
-    "source": "/usr/share/synterra/fastfetch-logo.txt",
-    "color": { "1": "blue", "2": "cyan", "3": "magenta" },
-    "padding": { "right": 4 }
-  }
-}

@@ -8,6 +8,8 @@ upstream=${ARCHISO_PROFILE:-/usr/share/archiso/configs/releng}
 mkdir -p "$dest"
 cp -a "$upstream/." "$dest/"
 cp -a "$repo/profile/airootfs/." "$dest/airootfs/"
+rm -f "$dest/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
+    "$dest/airootfs/usr/share/synterra/fastfetch-logo.txt"
 command -v cargo >/dev/null || { echo 'Install Rust and Cargo on the Arch build host.' >&2; exit 1; }
 cargo build --manifest-path "$repo/Cargo.toml" --locked --release
 install -Dm755 "$repo/target/release/synterra-tools" "$dest/airootfs/usr/local/libexec/synterra-tools"
@@ -16,6 +18,18 @@ cmake --build "$repo/target/surf" --parallel 2
 "$repo/target/surf/synterra-surf" --self-test
 install -Dm755 "$repo/target/surf/synterra-surf" "$dest/airootfs/usr/local/bin/synterra-surf"
 install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libexec/synterra-recover"
+theme="$dest/airootfs/usr/share/grub/themes/SynterraPrism"
+bash "$repo/scripts/build-grub-theme.sh" "$theme"
+mkdir -p "$dest/grub/themes"
+cp -R "$theme" "$dest/grub/themes/"
+install -Dm644 "$repo/assets/grub/live-theme.cfg" "$dest/grub/synterra-theme.cfg"
+# Load our graphics after upstream sets up its menu, without altering kernel paths.
+for config in "$dest/grub/grub.cfg" "$dest/grub/loopback.cfg"; do
+    cat >> "$config" <<'GRUB'
+
+source "${config_directory}/synterra-theme.cfg"
+GRUB
+done
 # Installer payload contains desktop defaults, not live accounts/autologin.
 payload="$dest/airootfs/usr/share/synterra/install-overlay"
 mkdir -p "$payload/etc/skel" "$payload/usr/share"
@@ -26,7 +40,9 @@ for item in plasma aurorae color-schemes icons; do
     cp -a "$repo/profile/airootfs/usr/share/$item" "$payload/usr/share/"
 done
 install -Dm644 "$repo/profile/airootfs/usr/share/synterra/os-release" "$payload/usr/share/synterra/os-release"
-install -Dm644 "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt" "$payload/usr/share/synterra/fastfetch-logo.txt"
+mkdir -p "$payload/usr/share/grub/themes"
+cp -R "$theme" "$payload/usr/share/grub/themes/"
+install -Dm755 "$repo/profile/airootfs/usr/local/libexec/synterra-grub-setup" "$payload/usr/local/libexec/synterra-grub-setup"
 install -Dm644 "$repo/profile/airootfs/usr/share/libalpm/hooks/90-synterra-branding.hook" "$payload/usr/share/libalpm/hooks/90-synterra-branding.hook"
 install -Dm755 "$repo/target/surf/synterra-surf" "$payload/usr/local/bin/synterra-surf"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-surf.desktop" "$payload/usr/share/applications/synterra-surf.desktop"
@@ -40,12 +56,13 @@ mkdir -p "$dest/airootfs/etc/pacman.d"
 printf 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\n' > "$dest/airootfs/etc/pacman.d/mirrorlist"
 cat >> "$dest/profiledef.sh" <<'PROFILE'
 
-# Synterra overrides; retain upstream boot modes, initramfs and install_dir.
+# Use GRUB for UEFI; retain Archiso's supported Syslinux BIOS fallback.
+bootmodes=('bios.syslinux' 'uefi.grub')
 iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="0.4.$(date -u +%Y%m%d)"
+iso_version="0.5.$(date -u +%Y%m%d)"
 file_permissions+=(
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
@@ -54,6 +71,8 @@ file_permissions+=(
   ["/usr/local/bin/synterra-surf"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-surf"]="0:0:755"
   ["/usr/local/libexec/synterra-recover"]="0:0:755"
+  ["/usr/local/libexec/synterra-grub-setup"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synterra-grub-setup"]="0:0:755"
   ["/etc/sudoers.d/10-synterra-live"]="0:0:440"
 )
 PROFILE
@@ -85,7 +104,7 @@ ln -sfn /usr/lib/systemd/system/graphical.target "$system/default.target"
 rm -f "$system/getty@tty1.service.d/autologin.conf"
 for bootdir in grub efiboot syslinux; do
     if [[ -d $dest/$bootdir ]]; then
-        find "$dest/$bootdir" -type f \( -name '*.cfg' -o -name '*.conf' \) -exec sed -i 's/Arch Linux/Synterra/g' {} +
+        find "$dest/$bootdir" -type f \( -name '*.cfg' -o -name '*.conf' \) -exec sed -i 's/Arch Linux/Synterra/g; s/Synterra install medium/Synterra Live Desktop/g' {} +
     fi
 done
 echo "Prepared $dest"

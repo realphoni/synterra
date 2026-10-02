@@ -1,4 +1,5 @@
 mod artwork;
+mod boot_preview;
 mod installer;
 mod signature;
 mod validate;
@@ -21,6 +22,7 @@ fn run() -> Result {
         Some("test-bootstrap-signature") => signature::test(),
         Some("install") => installer::install(),
         Some("test-installer") => installer::test(),
+        Some("boot-preview") => boot_preview::preview(),
         _ => Err(
             "Usage: synterra-tools <generate-artwork|validate|test-bootstrap-signature|install|test-installer>"
                 .into(),

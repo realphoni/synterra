@@ -67,7 +67,12 @@ grep -Eq '^[^#]+[[:space:]]+/[[:space:]]+' "$new_fstab"
 install -m644 "$new_fstab" "$target/etc/fstab"
 rm -f "$new_fstab"
 if [[ -f $target/boot/grub/grub.cfg ]]; then
-    arch-chroot "$target" grub-mkconfig -o /boot/grub/grub.cfg
+    if [[ -x $target/usr/local/libexec/synterra-grub-setup && -f $target/usr/share/grub/themes/SynterraPrism/theme.txt ]]; then
+        arch-chroot "$target" /usr/local/libexec/synterra-grub-setup
+    else
+        # Older live-image payloads do not contain the Prism 0.5 theme helper.
+        arch-chroot "$target" grub-mkconfig -o /boot/grub/grub.cfg
+    fi
 fi
 sync
 echo 'Synterra recovery finished. Shut down, remove the ISO and boot the installed disk.'

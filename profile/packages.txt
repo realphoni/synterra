@@ -41,3 +41,4 @@ kdialog
 rust
 cargo
 fastfetch
+grub

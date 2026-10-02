@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Install Synterra Indev
-Comment=Guided installation of Synterra Indev (Prism 0.4)
+Comment=Guided installation of Synterra Indev (Prism 0.5)
 Exec=synterra-install
 Icon=synterra
 Categories=System;
