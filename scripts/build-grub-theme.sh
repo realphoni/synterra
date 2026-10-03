@@ -13,6 +13,9 @@ install -m644 "$repo/assets/grub/theme.txt" "$dest/theme.txt"
 # Keep the supplied Aurora wallpaper unchanged; GRUB scales it to the display.
 install -m644 "$repo/assets/wallpapers/Prism-aurora-4K.png" "$dest/background.png"
 rsvg-convert -w 96 -h 96 "$repo/profile/airootfs/usr/share/icons/hicolor/scalable/apps/synterra.svg" -o "$dest/logo.png"
+install -m644 "$repo/assets/grub/bios-splash.svg" "$dest/bios-splash.svg"
+rsvg-convert "$dest/bios-splash.svg" -o "$dest/bios-splash.png"
+rm -f "$dest/bios-splash.svg"
 for size in 16 18 24 32; do
     # The theme uses Latin text; exclude oversized glyphs from other scripts.
     grub-mkfont -n Synterra -r 0x20-0x7e,0xa0-0xff -s "$size" -o "$dest/synterra-$size.pf2" "$font"

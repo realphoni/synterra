@@ -9,7 +9,7 @@ destination=${2:-/mnt/e/tuff/out}
 repo=/root/synterra
 mkdir -p "$repo" "$destination"
 # Build on the Linux filesystem; do not put archiso working files on DrvFS.
-for item in scripts src browser Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
+for item in scripts src browser desktop Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
     cp -a "$source_dir/$item" "$repo/"
 done
 # Remove the obsolete pre-install branding overlay from earlier source copies.
@@ -18,9 +18,12 @@ rm -f "$repo/profile/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
     "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine grub librsvg ttf-dejavu
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg grub librsvg ttf-dejavu
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh
-find "$repo/out" -maxdepth 1 -type f \( -name '*.iso' -o -name '*.log' -o -name SHA256SUMS \) -exec cp -uv {} "$destination/" \;
+read -r digest image < "$repo/out/SHA256SUMS"
+[[ $image == synterra-*.iso && $image != */* ]] || { echo 'Unexpected ISO checksum entry.' >&2; exit 1; }
+cp -uv "$repo/out/$image" "$repo/out/SHA256SUMS" "$destination/"
+find "$repo/out" -maxdepth 1 -type f -name '*.log' -exec cp -uv {} "$destination/" \;
 echo "Synterra ISO copied to $destination"

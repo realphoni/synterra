@@ -45,6 +45,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QFile>
+#include <QSaveFile>
 #include <QtTest/QTest>
 #include "state.h"
 
@@ -92,6 +93,56 @@ class Surf final : public QMainWindow {
     int activeDownloads = 0;
     QString smokeDownloadPath;
     bool smokeDownloadSaved = false;
+    QString smokePdfPath;
+    bool smokePdfSaved = false;
+    QLabel *zoomLabel = new QLabel("100%", this);
+    Qt::WindowStates normalState;
+
+    void fullscreen() {
+        if (isFullScreen()) { if (normalState.testFlag(Qt::WindowMaximized)) showMaximized(); else showNormal(); }
+        else { normalState = windowState(); showFullScreen(); }
+    }
+    void savePdf() {
+        if (!current()) return;
+        const QString path = smokePdfPath.isEmpty() ? QFileDialog::getSaveFileName(this,
+            privateMode ? "Save PDF — this file will remain on disk" : "Save page as PDF",
+            QDir(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)).filePath("page.pdf"), "PDF documents (*.pdf)") : smokePdfPath;
+        if (path.isEmpty()) return;
+        const auto destination = path.endsWith(".pdf", Qt::CaseInsensitive) ? path : path + ".pdf";
+        if (destination != path && QFileInfo::exists(destination) && QMessageBox::question(this, "Replace PDF", "The PDF file already exists. Replace it?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) return;
+        QPointer<Surf> owner(this);
+        current()->page()->printToPdf([owner, destination](const QByteArray &bytes) {
+            if (!owner) return;
+            QSaveFile file(destination);
+            const bool saved = !bytes.isEmpty() && file.open(QIODevice::WriteOnly) && file.write(bytes) == bytes.size() && file.commit();
+            owner->statusBar()->showMessage(saved ? "PDF saved" : "Could not save PDF", 5000);
+            if (!owner->smokePdfPath.isEmpty()) {
+                QFile check(destination); owner->smokePdfSaved = saved && check.open(QIODevice::ReadOnly) && check.read(5) == "%PDF-" && check.size() > 1024;
+            } else if (!saved) QMessageBox::warning(owner, "PDF export", "The page could not be saved. Check the destination and try again after the page has loaded.");
+        });
+    }
+    void manageBookmarks() {
+        QDialog dialog(this); dialog.setWindowTitle("Manage bookmarks"); dialog.resize(620, 430);
+        QVBoxLayout layout(&dialog); QLineEdit filter; filter.setPlaceholderText("Search bookmarks"); QListWidget list;
+        layout.addWidget(&filter); layout.addWidget(&list);
+        for (const auto &url : settings.value("bookmarks").toStringList()) list.addItem(url);
+        QDialogButtonBox buttons; auto open = buttons.addButton("Open", QDialogButtonBox::ActionRole);
+        auto remove = buttons.addButton("Remove selected", QDialogButtonBox::ActionRole);
+        buttons.addButton(QDialogButtonBox::Close); layout.addWidget(&buttons);
+        connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        connect(&filter, &QLineEdit::textChanged, &dialog, [&list](const QString &text) {
+            for (int i = 0; i < list.count(); ++i) list.item(i)->setHidden(!list.item(i)->text().contains(text, Qt::CaseInsensitive));
+        });
+        auto visit = [this, &list, &dialog] { if (list.currentItem()) { const auto url = destination(list.currentItem()->text()); if (webAddress(url)) { addTab(url); dialog.accept(); } } };
+        connect(open, &QPushButton::clicked, &dialog, visit);
+        connect(&list, &QListWidget::itemActivated, &dialog, [visit](QListWidgetItem *) { visit(); });
+        connect(remove, &QPushButton::clicked, &dialog, [this, &list] {
+            if (!list.currentItem()) return;
+            auto saved = settings.value("bookmarks").toStringList(); saved.removeAll(list.currentItem()->text());
+            settings.setValue("bookmarks", saved); delete list.takeItem(list.currentRow());
+        });
+        dialog.exec();
+    }
 
     void find(bool backwards = false) {
         if (current()) current()->findText(findInput->text(), backwards ? QWebEnginePage::FindBackward : QWebEnginePage::FindFlags());
@@ -199,6 +250,7 @@ class Surf final : public QMainWindow {
         address->setText(view->url() == homeUrl ? QString() : view->url().toDisplayString());
         backAction->setEnabled(view->history()->canGoBack());
         forwardAction->setEnabled(view->history()->canGoForward());
+        zoomLabel->setText(QString::number(qRound(view->zoomFactor() * 100)) + "%");
         setWindowTitle((view->title().isEmpty() ? "New tab" : view->title()) + " — Synterra Surf" + (privateMode ? " · Private" : ""));
         statusBar()->showMessage(view->url().scheme() == "https" ? "HTTPS" : view->url() == homeUrl ? privateMode ? "Private window · downloads are saved to disk" : "Welcome to Synterra Surf" : view->url().scheme().toUpper());
     }
@@ -230,6 +282,7 @@ class Surf final : public QMainWindow {
             statusBar()->showMessage("Bookmark saved", 2500);
         });
         menu.addSeparator();
+        menu.addAction("Manage bookmarks", this, [this] { manageBookmarks(); });
         const auto saved = settings.value("bookmarks").toStringList();
         for (const auto &url : saved) menu.addAction(url, this, [this, url] { addTab(destination(url)); });
         if (saved.isEmpty()) menu.addAction("Your saved pages appear here")->setEnabled(false);
@@ -294,12 +347,16 @@ public:
         menu->addAction("Browsing history", this, [this] { history(); })->setEnabled(!privateMode);
         menu->addAction("Reopen closed tab", this, [this] { reopen(); });
         menu->addAction("Reset page zoom", this, [this] { current()->setZoomFactor(1); });
+        menu->addAction("Manage bookmarks", this, [this] { manageBookmarks(); });
+        menu->addAction("Save page as PDF", this, [this] { savePdf(); });
+        menu->addAction("Full screen (F11)", this, [this] { fullscreen(); });
         menu->addSeparator();
         menu->addAction("Settings", this, [this] { preferences(); })->setEnabled(!privateMode);
         menu->addAction("About Surf", this, [this] {
-            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>Indev · Prism 0.5</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
+            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>1.0 · Prism</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
         });
         applyStyle();
+        zoomLabel->setMinimumWidth(48); statusBar()->addPermanentWidget(zoomLabel);
         connect(address, &QLineEdit::returnPressed, this, [this] { navigate(); });
         connect(tabs, &QTabWidget::tabCloseRequested, this, [this](int index) { closeTab(index); });
         connect(tabs, &QTabWidget::currentChanged, this, [this] { syncNavigation(); findResult->clear(); if (findBar->isVisible()) find(); });
@@ -315,7 +372,9 @@ public:
         shortcut("Ctrl+Shift+T", [this] { reopen(); });
         shortcut("Ctrl+Shift+N", [] { auto window = new Surf(true); window->setAttribute(Qt::WA_DeleteOnClose); window->addTab(homeUrl); window->show(); });
         shortcut("Ctrl+0", [this] { current()->setZoomFactor(1); });
-        shortcut("Escape", [this] { if (findBar->isVisible()) { findBar->hide(); current()->findText({}); current()->setFocus(); } else current()->stop(); });
+        shortcut("Ctrl+P", [this] { savePdf(); });
+        shortcut("F11", [this] { fullscreen(); });
+        shortcut("Escape", [this] { if (isFullScreen()) fullscreen(); else if (findBar->isVisible()) { findBar->hide(); current()->findText({}); current()->setFocus(); } else current()->stop(); });
         shortcut("Alt+Left", [this] { current()->back(); });
         shortcut("Alt+Right", [this] { current()->forward(); });
         shortcut("Ctrl++", [this] { current()->setZoomFactor(std::min(3.0, current()->zoomFactor() + .1)); });
@@ -341,11 +400,38 @@ public:
         if (tabs->count() != count) { std::cerr << "FAIL: tab closure.\n"; return false; }
         Surf privateWindow(true);
         if (!privateWindow.profile->isOffTheRecord() || privateWindow.profile->persistentCookiesPolicy() != QWebEngineProfile::NoPersistentCookies || !privateWindow.startupTabs().isEmpty()) { std::cerr << "FAIL: private profile isolation.\n"; return false; }
+        QTest::keyClick(current(), Qt::Key_F11); QTest::qWait(100);
+        if (!isFullScreen()) { std::cerr << "FAIL: F11 fullscreen.\n"; return false; }
+        QTest::keyClick(current(), Qt::Key_Escape); QTest::qWait(100);
+        if (isFullScreen()) { std::cerr << "FAIL: Escape fullscreen exit.\n"; return false; }
+        current()->setZoomFactor(1.2); QTest::qWait(100);
+        if (zoomLabel->text() != "120%") { std::cerr << "FAIL: zoom indicator.\n"; return false; }
+        current()->setZoomFactor(1);
+        const auto originalBookmarks = settings.value("bookmarks");
+        settings.setValue("bookmarks", QStringList{"https://example.org/one", "https://example.org/two"});
+        bool bookmarkCheck = false;
+        QTimer::singleShot(100, this, [this, &bookmarkCheck] {
+            auto dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+            if (!dialog) return;
+            auto list = dialog->findChild<QListWidget *>(); auto filter = dialog->findChild<QLineEdit *>();
+            if (!list || !filter) { dialog->reject(); return; }
+            filter->setText("two");
+            if (list->count() == 2 && list->item(0)->isHidden() && !list->item(1)->isHidden()) {
+                list->setCurrentRow(1);
+                for (auto button : dialog->findChildren<QPushButton *>()) if (button->text() == "Remove selected") button->click();
+                bookmarkCheck = settings.value("bookmarks").toStringList() == QStringList{"https://example.org/one"};
+            }
+            dialog->reject();
+        });
+        manageBookmarks(); settings.setValue("bookmarks", originalBookmarks);
+        if (!bookmarkCheck) { std::cerr << "FAIL: bookmark search/removal.\n"; return false; }
         return true;
     }
     QString findSummary() const { return findResult->text(); }
     void smokeDownload(const QUrl &url, const QString &path) { smokeDownloadPath = path; current()->page()->download(url); }
     bool downloadTestPassed() const { return smokeDownloadSaved && activeDownloads == 0; }
+    void smokePdf(const QString &path) { smokePdfPath = path; QApplication::setActiveWindow(this); current()->setFocus(); QTest::qWait(150); QTest::keyClick(current(), Qt::Key_P, Qt::ControlModifier); }
+    bool pdfTestPassed() const { return smokePdfSaved; }
     QWebEngineView *addTab(const QUrl &url) {
         auto view = new QWebEngineView;
         auto page = new QWebEnginePage(profile, view);
@@ -362,6 +448,7 @@ public:
         connect(page, &QWebEnginePage::findTextFinished, this, [this, view](const QWebEngineFindTextResult &result) {
             if (view == current()) findResult->setText(QString("%1 / %2").arg(result.activeMatch()).arg(result.numberOfMatches()));
         });
+        connect(page, &QWebEnginePage::zoomFactorChanged, this, [this, view] { if (view == current()) syncNavigation(); });
         tabs->addTab(view, "New tab");
         tabs->setCurrentWidget(view);
         connect(view, &QWebEngineView::titleChanged, this, [this, view](const QString &title) {
@@ -437,13 +524,19 @@ int main(int argc, char **argv) {
                 if (!result.toBool()) { app.exit(1); return; }
                 if (!window.smokeWidgets()) { app.exit(1); return; }
                 window.smokeDownload(QUrl(QString("http://127.0.0.1:%1/download").arg(fixture.serverPort())), downloadDirectory.filePath("fixture.txt"));
-                QTimer::singleShot(2500, &app, [&window, &app] {
+                window.smokePdf(downloadDirectory.filePath("fixture.pdf"));
+                auto finished = new QTimer(&app); finished->setInterval(100);
+                QObject::connect(finished, &QTimer::timeout, &app, [&window, &app, finished, attempts = 0]() mutable {
+                    if ((!window.downloadTestPassed() || !window.pdfTestPassed()) && ++attempts < 100) return;
+                    finished->stop();
                     if (window.findSummary().isEmpty() || window.findSummary().endsWith(" / 0")) { std::cerr << "FAIL: find results: " << window.findSummary().toStdString() << "\n"; app.exit(1); return; }
                     if (!window.downloadTestPassed()) { std::cerr << "FAIL: local HTTP download/progress completion.\n"; app.exit(1); return; }
+                    if (!window.pdfTestPassed()) { std::cerr << "FAIL: Ctrl+P PDF export.\n"; app.exit(1); return; }
                     const auto path = qEnvironmentVariable("SYNTERRA_SURF_SCREENSHOT");
                     if (!path.isEmpty() && !window.grab().save(path)) { app.exit(1); return; }
-                    std::cout << "PASS: Chromium start page, Ctrl+F/find matches, tab closure, private profile and local HTTP download contents/completion.\n"; app.exit(0);
+                    std::cout << "PASS: Chromium rendering, find, tabs, private profile, downloads, F11/Escape, zoom, bookmark search/removal and Ctrl+P PDF export.\n"; app.exit(0);
                 });
+                finished->start();
             });
         });
     }

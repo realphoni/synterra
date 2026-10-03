@@ -57,6 +57,9 @@ if [[ ${previous_manager##*/} == cosmic-greeter.service ]]; then
 fi
 systemctl --root="$target" --force enable sddm
 systemctl --root="$target" enable NetworkManager vmtoolsd
+if [[ -f $target/usr/lib/systemd/system/bluetooth.service ]]; then
+    systemctl --root="$target" enable bluetooth
+fi
 systemctl --root="$target" set-default graphical.target
 if [[ -f $target/etc/fstab ]]; then
     cp -a "$target/etc/fstab" "$target/etc/fstab.before-synterra-recovery-$(date +%s)"

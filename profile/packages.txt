@@ -17,6 +17,7 @@ konsole
 kate
 ark
 qt6-webengine
+qt6-svg
 spectacle
 gwenview
 okular
@@ -42,3 +43,8 @@ rust
 cargo
 fastfetch
 grub
+kdeconnect
+kcalc
+bluedevil
+bluez
+bluez-utils

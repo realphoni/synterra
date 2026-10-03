@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Synterra Hub
+Comment=Set up and explore Synterra 1.0
+Exec=synterra-hub
+Icon=synterra
+Categories=Settings;System;
+StartupNotify=true

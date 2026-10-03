@@ -1,26 +1,32 @@
-# Build status — 2026-10-02
+# Build status — 2026-10-03
 
-Synterra Indev (Prism 0.5) built successfully with Archiso in `SynterraBuild`.
+Synterra 1.0 (Prism) built successfully with official Archiso in `SynterraBuild`.
 
-- Image: `synterra-0.5.20261002-x86_64.iso`.
-- Size: 2,398,257,152 bytes.
-- SHA-256: `11d6e6d684d696f7006beb768ed0cefecc688832eddd7b4ab62acb0204e6cf52`.
-- Release assets: two ISO parts, whole-image and part checksums, and a screenshot of the finished ISO's UEFI GRUB screen.
+- Image: `synterra-1.0.20261003-x86_64.iso`.
+- Size: 2,407,563,264 bytes (about 2.24 GiB).
+- SHA-256: `abc162802fd5461e17be5b85addc430af924fcf74cd531ff636c5dda8ab4f6f2`.
+- Release: `v1.0.0`, with two ISO parts, whole-image and part checksums, Surf 1.0 update archive/checksum and screenshots.
 
-## Prism 0.5
+## Changes
 
-The custom Fastfetch logo and preset are removed; standard Fastfetch remains installed. UEFI live boot uses GRUB with the original Aurora wallpaper, Synterra orb, glass selection and countdown. Legacy BIOS live boot retains Archiso's Syslinux menu. GRUB is the installer's default bootloader; finalization installs the same theme on configured GRUB systems. Other bootloaders are retained without a GRUB splash.
+OS, installer, browser, desktop and boot branding use Synterra 1.0 (Prism). Native Synterra Hub provides settings, application launchers, phone integration, installation and administrator-assisted updates. First-login welcome preferences are saved locally; updates are unavailable in live sessions. Official KDE Connect, KCalc, Bluedevil and BlueZ packages are included.
 
-Theme resources are copied into `/boot/grub/themes/SynterraPrism` to support a separate boot partition and encrypted root. Managed settings and a font loader preserve existing `/etc/default/grub` kernel/encryption options. Theme generation uses official GRUB fonts, DejaVu and librsvg. Latin font ranges and an explicit terminal font avoid oversized Unicode glyph metrics in GRUB.
+Surf 1.0 adds PDF export, fullscreen, a zoom indicator and searchable bookmarks with individual removal. Its Chromium engine comes from Arch's Qt WebEngine package. Standard Fastfetch remains available without the obsolete custom logo or preset.
 
-Surf and the desktop applications from Prism 0.4 remain included. Original wallpapers and desktop contrast are unchanged.
+Both UEFI GRUB and BIOS Syslinux display Synterra artwork. The original Aurora and Graphite wallpapers are unchanged. Installed GRUB themes stay under `/boot/grub/themes/SynterraPrism`, with managed settings that preserve existing kernel and encryption options.
+
+The installer now uses Archinstall's current `bootloader_config` format, checks for a root fstab entry and real user-home directories before copying its payload, and enables Bluetooth during finalization. The COSMIC-to-SDDM repair and guarded recovery helper remain included.
 
 ## Validation
 
-Rust source validation and installer target/greeter regression checks passed. Bash and GRUB syntax checks passed. Native Surf compilation and self-tests passed during profile generation. Theme staging in a disposable target preserved the existing kernel/encryption settings.
+Rust source validation and installer target/greeter regressions passed, including incomplete fstab and symlinked-home rejection. Bash and GRUB syntax checks passed. Native Surf and Hub compilation passed. Sandboxed, unprivileged Surf tests exercised real Chromium rendering, find results, tabs, private state, an HTTP download fixture, F11/Escape, zoom, bookmark search/removal and Ctrl+P PDF output. Hub rendered with its embedded orb and passed both live/installed action checks.
 
-The finished ISO was inspected through a read-only mount. Its GRUB loader and theme files are present; obsolete Fastfetch branding is absent from SquashFS. Live and installer-payload theme helpers are executable. Desktop contrast and the original Aurora wallpaper were verified in the compressed image; the GRUB background has the same SHA-256 as the supplied original.
+The compressed final ISO was mounted read-only. Live and installed-payload versions, executable Hub/Surf/welcome/theme helpers, welcome autostart, Bluetooth service and added applications were verified. Both original wallpapers match their source SHA-256 hashes in live and installed payloads. The GRUB background also matches the original Aurora PNG. The BIOS splash is a generated 640 × 480 derivative.
 
-Both firmware boot menus were rendered from the final ISO in isolated QEMU with no writable disk or network. Screenshots were visually inspected: UEFI displays the Synterra splash and countdown; BIOS displays the supported Syslinux fallback. This verifies the boot menus, not the full desktop session or an installation. A full installation to a disposable VM disk, encrypted installations and broader hardware compatibility still need manual validation. Release signing remains future work.
+Both firmware menus were rendered from the final ISO in isolated QEMU without a writable disk or network and visually inspected. A separate six-minute UEFI live boot with 3 GiB RAM reached the KDE desktop, Aurora wallpaper, Aero taskbar and Synterra Hub. Its screenshot shows the live install button and disabled update control. This confirms desktop startup; it does not prove a full installation or every application/device integration.
 
-At Archinstall completion choose Exit and wait for Synterra finalization before rebooting. The installer retains the COSMIC-to-SDDM repair and guarded recovery entry. The online recovery helper retains a plain GRUB configuration fallback for older live-image payloads that do not contain the new theme helper.
+## Remaining validation
+
+A complete installation to a disposable VM disk, encrypted installations, BIOS desktop startup, wider hardware compatibility, physical Bluetooth/KDE Connect pairing and broad website/download-cancellation behavior still need testing. Release signing is future work. The 1.0 name does not remove these limitations.
+
+At Archinstall completion choose Exit and wait for Synterra finalization before rebooting. If an installer guard fails, keep the live session running and inspect the reported condition rather than rebooting an incomplete target.

@@ -141,6 +141,11 @@ pub fn validate(repo: &Path) -> Result {
         "vlc-plugins-all",
         "filelight",
         "grub",
+        "kdeconnect",
+        "kcalc",
+        "bluedevil",
+        "bluez",
+        "bluez-utils",
     ] {
         require(
             unique.contains(package),

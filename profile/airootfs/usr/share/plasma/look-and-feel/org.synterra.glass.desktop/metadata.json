@@ -4,7 +4,7 @@
     "Id": "org.synterra.glass.desktop",
     "Name": "Synterra Glass",
     "Description": "A luminous glass desktop for Synterra",
-    "Version": "0.5.0",
+    "Version": "1.0.0",
     "License": "MIT",
     "Authors": [{"Name": "Synterra contributors"}]
   },

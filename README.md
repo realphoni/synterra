@@ -1,34 +1,46 @@
-# Synterra Indev (Prism 0.5)
+# Synterra 1.0 (Prism)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra Indev Prism 0.5 release](https://github.com/realphoni/synterra/releases/tag/v0.5.20261002-alpha). The image is 2,398,257,152 bytes (about 2.23 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.0 (Prism) release](https://github.com/realphoni/synterra/releases/tag/v1.0.0). The image is 2,407,563,264 bytes (about 2.24 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-0.5.20261002-x86_64.iso.part00 synterra-0.5.20261002-x86_64.iso.part01 > synterra-0.5.20261002-x86_64.iso
+cat synterra-1.0.20261003-x86_64.iso.part00 synterra-1.0.20261003-x86_64.iso.part01 > synterra-1.0.20261003-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-0.5.20261002-x86_64.iso.part00+synterra-0.5.20261002-x86_64.iso.part01 synterra-0.5.20261002-x86_64.iso
+copy /b synterra-1.0.20261003-x86_64.iso.part00+synterra-1.0.20261003-x86_64.iso.part01 synterra-1.0.20261003-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-0.5.20261002-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.0.20261003-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `11d6e6d684d696f7006beb768ed0cefecc688832eddd7b4ab62acb0204e6cf52`.
+Expected SHA-256: `abc162802fd5461e17be5b85addc430af924fcf74cd531ff636c5dda8ab4f6f2`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
+
+## New in Synterra 1.0
+
+- **Synterra Hub** brings display, network, Bluetooth, phone integration, applications and update controls into one native desktop welcome window. It appears once on first sign-in; choose “Show this welcome when I sign in” to keep it. Open it anytime from the application menu.
+- **KDE Connect** pairs your phone with the desktop, **KCalc** adds a calculator, and **Bluedevil/BlueZ** provide Bluetooth controls. Pair devices explicitly through their setup screens.
+- **Surf 1.0** adds PDF export (Ctrl+P), full-screen mode (F11, Escape to exit), a zoom indicator and searchable bookmarks with individual removal. Private-window PDF exports remain on disk like downloads.
+- UEFI GRUB and BIOS Syslinux now share Synterra artwork using your original Aurora wallpaper and orb. The custom fetch logo remains removed.
+- The installer uses Archinstall's current GRUB configuration format and rejects incomplete root fstab entries or unsafe user-home paths before copying desktop files.
+
+### Synterra Hub
+
+Use Get started for desktop settings and phone pairing, Applications for the included apps, and About & help for system information and documentation. System updates open the normal administrator-assisted `pacman -Syu` transaction in a terminal so you can review changes. Updates are disabled in the live session; they become available after installation. Bluetooth and KDE Connect still need testing with physical devices.
 
 ## New in Prism 0.5
 
@@ -58,20 +70,21 @@ Use the Menu button for history, settings and private windows. Session restorati
 | Ctrl+F / Escape | Find in page / close find bar or stop loading |
 | Ctrl+H / Ctrl+J / Ctrl+D | History / downloads / bookmarks |
 | Ctrl+R / Alt+Left / Alt+Right | Reload / back / forward |
+| Ctrl+P / F11 | Save page as PDF / toggle full screen |
 | Ctrl++ / Ctrl+- / Ctrl+0 | Zoom in / zoom out / reset zoom |
 
 Private windows use a separate [Qt off-the-record profile](https://doc.qt.io/qt-6/qwebengineprofile.html#QWebEngineProfile), with memory-only cookies/cache and no Surf history or session persistence. Downloads and explicitly saved bookmarks remain on disk. Private browsing does not hide traffic from websites or network operators. Website permissions still ask, and normal certificate validation and Chromium sandboxing stay enabled.
 
-Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Tests cover address parsing, history limits/deduplication, credential stripping, session/private isolation, actual page rendering, Ctrl+F/find results, tab closure and an HTTP download fixture. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
+Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Tests cover address parsing, history limits/deduplication, credential stripping, session/private isolation, actual page rendering, Ctrl+F/find results, tab closure, an HTTP download fixture, F11/Escape, zoom, bookmark search/removal and Ctrl+P PDF export. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
 
 ### Update Surf on an existing Synterra installation
 
-Download `synterra-surf-0.4.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the Prism 0.4 release. Verify and extract, close Surf, then run these commands from the extracted directory:
+Download `synterra-surf-1.0.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Synterra 1.0 release](https://github.com/realphoni/synterra/releases/tag/v1.0.0). Put both downloads in one folder and close Surf, then run:
 
 ```bash
 sha256sum -c SHA256SUMS.surf
-tar -xzf synterra-surf-0.4.0-linux-x86_64.tar.gz
-cd synterra-surf-0.4.0-linux-x86_64
+tar -xzf synterra-surf-1.0.0-linux-x86_64.tar.gz
+cd synterra-surf-1.0.0-linux-x86_64
 sudo pacman -Syu qt6-webengine qt6-base
 sudo install -Dm755 synterra-surf /usr/local/bin/synterra-surf
 sudo install -Dm644 synterra-surf.desktop /usr/share/applications/synterra-surf.desktop
@@ -125,7 +138,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `grub`, `librsvg` and `ttf-dejavu` installed:
+On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `qt6-svg`, `grub`, `librsvg` and `ttf-dejavu` installed:
 
 ```bash
 sudo bash scripts/build-arch.sh
@@ -147,7 +160,7 @@ The live account has no password; root administration is available through sudo.
 
 ## Install Synterra
 
-Open **Install Synterra Indev** from the desktop or application menu. The Rust launcher starts Archinstall's guided terminal interface with KDE Plasma, Synterra's packages and NetworkManager selected. Connect to the internet first; installation downloads packages from Arch mirrors.
+Open **Install Synterra** from the desktop or application menu. The Rust launcher starts Archinstall's guided terminal interface with KDE Plasma, Synterra's packages and NetworkManager selected. Connect to the internet first; installation downloads packages from Arch mirrors.
 
 Choose the target disk, partition layout, timezone, bootloader and a regular administrator account with a password. GRUB is selected by default; retain it for the Synterra splash. Other bootloaders do not display the GRUB theme. Review the disk summary before confirming: formatting erases existing data. Keep the KDE profile and Synterra package list selected.
 
@@ -159,7 +172,7 @@ Installed systems use the account you created. Live-session autologin, the live 
 
 The splash uses your original Aurora wallpaper unchanged. Arrow keys select an entry; Enter boots, E edits and C opens GRUB's console. Theme sources live in `assets/grub/`; the builder generates fonts and glass frame PNGs using GRUB and librsvg.
 
-Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, including when `/boot` is separate from an encrypted root. Settings live in `/etc/default/grub.d/10-synterra.cfg`; `/etc/default/grub` retains its existing disk and kernel options. To refresh the theme on an installed Prism 0.5 GRUB system, run `sudo /usr/local/libexec/synterra-grub-setup`.
+Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, including when `/boot` is separate from an encrypted root. Settings live in `/etc/default/grub.d/10-synterra.cfg`; `/etc/default/grub` retains its existing disk and kernel options. To refresh the theme on an installed Synterra GRUB system, run `sudo /usr/local/libexec/synterra-grub-setup`.
 
 ## Recover a Prism 0.2 greeter conflict
 
@@ -176,11 +189,12 @@ The helper checks the mounted root, installed packages and (on UEFI) the mounted
 
 ## Files
 
-- `scripts/`: verified-bootstrap builder, Arch builder, profile generator and theme validator.
+- scripts/: verified-bootstrap builder, Arch builder, profile generator and theme validator.
+- desktop/: native Qt Synterra Hub.
 - `profile/packages.txt`: extra packages layered onto upstream Arch releng.
 - `profile/airootfs/`: branding, live-session configuration and desktop defaults.
 - `assets/wallpapers/`: supplied originals, copied to the image during profile generation.
-- `assets/grub/`: boot splash layout and live GRUB loader.
+- `assets/grub/`: GRUB layout, live loader and BIOS splash artwork.
 - `docs/BUILD-STATUS.md`: actual validation and VMware status.
 
 ## Rust development tools

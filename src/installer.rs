@@ -49,12 +49,28 @@ fn validate_target(target: &Path) -> Result<Vec<String>> {
     {
         return Err("Arch installation was cancelled, failed, or used a different target. No Synterra files were applied.".into());
     }
+    let fstab = fs::read_to_string(target.join("etc/fstab"))?;
+    if !fstab.lines().any(|line| {
+        let line = line.trim();
+        !line.starts_with('#') && line.split_whitespace().nth(1) == Some("/")
+    }) {
+        return Err("The installed system has no root mount in fstab. Finish Archinstall before applying Synterra.".into());
+    }
     let users = user_names(&fs::read_to_string(target.join("etc/passwd"))?);
     if users.is_empty() {
         return Err(
             "Create a regular administrator account in Archinstall before finalizing Synterra."
                 .into(),
         );
+    }
+    for user in &users {
+        let home = target.join("home").join(user);
+        if !fs::symlink_metadata(&home)?.is_dir() {
+            return Err(
+                "An installed user home is missing or symlinked. No Synterra files were applied."
+                    .into(),
+            );
+        }
     }
     Ok(users)
 }
@@ -77,7 +93,7 @@ pub fn install() -> Result {
     if !Path::new(PAYLOAD).join("etc/skel").is_dir() {
         return Err("Installer desktop payload is missing.".into());
     }
-    println!("\nSynterra Indev (Prism 0.5) installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
+    println!("\nSynterra 1.0 (Prism) installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
     let mut answer = String::new();
     io::stdin().read_line(&mut answer)?;
     if !answer.trim().is_empty() {
@@ -91,7 +107,8 @@ pub fn install() -> Result {
         .map(String::from)
         .collect();
     let config = json!({
-        "hostname": "synterra", "kernels": ["linux"], "bootloader": "Grub",
+        "hostname": "synterra", "kernels": ["linux"],
+        "bootloader_config": {"bootloader": "Grub", "uki": false, "removable": true},
         "packages": packages,
         "profile_config": {"profile": {"main": "Desktop", "details": ["KDE Plasma"]}, "gfx_driver": "All open-source", "greeter": "sddm"},
         "network_config": {"type": "nm"}, "audio_config": {"audio": "pipewire"},
@@ -165,6 +182,7 @@ pub fn install() -> Result {
             "NetworkManager",
             "sddm",
             "vmtoolsd",
+            "bluetooth",
         ],
     )?;
     command(
@@ -199,6 +217,16 @@ pub fn test() -> Result {
     fs::write(temp.join("usr/bin/pacman"), "")?;
     fs::write(
         temp.join("etc/passwd"),
+        "phoni:x:1000:1000::/home/phoni:/bin/bash",
+    )?;
+    fs::create_dir_all(temp.join("home/phoni"))?;
+    assert!(
+        validate_target(&temp).is_err(),
+        "An empty fstab must reject an incomplete installation"
+    );
+    fs::write(temp.join("etc/fstab"), "UUID=fixture / ext4 defaults 0 1\n")?;
+    fs::write(
+        temp.join("etc/passwd"),
         "live:x:1000:1000::/home/live:/bin/bash",
     )?;
     assert!(validate_target(&temp).is_err());
@@ -208,6 +236,17 @@ pub fn test() -> Result {
     )?;
     assert_eq!(validate_target(&temp)?, vec!["phoni"]);
     if std::env::consts::OS == "linux" {
+        #[cfg(target_os = "linux")]
+        {
+            fs::remove_dir(temp.join("home/phoni"))?;
+            std::os::unix::fs::symlink(temp.join("etc"), temp.join("home/phoni"))?;
+            assert!(
+                validate_target(&temp).is_err(),
+                "A symlinked user home must be rejected before copying the payload"
+            );
+            fs::remove_file(temp.join("home/phoni"))?;
+            fs::create_dir(temp.join("home/phoni"))?;
+        }
         let units = temp.join("usr/lib/systemd/system");
         fs::create_dir_all(&units)?;
         let unit = "[Unit]\nDescription=Installer regression fixture\n[Service]\nExecStart=/usr/bin/true\n[Install]\nAlias=display-manager.service\n";
@@ -231,6 +270,6 @@ pub fn test() -> Result {
         );
     }
     fs::remove_dir_all(temp)?;
-    println!("PASS: installer target guards and COSMIC-to-SDDM alias conflict regression.");
+    println!("PASS: installer readiness, root fstab, regular-user/home guards and COSMIC-to-SDDM alias conflict regression.");
     Ok(())
 }

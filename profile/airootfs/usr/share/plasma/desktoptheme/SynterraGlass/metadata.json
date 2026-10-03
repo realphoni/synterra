@@ -3,7 +3,7 @@
     "Id": "SynterraGlass",
     "Name": "Synterra Glass",
     "Description": "Blue glass with light edges and soft translucency",
-    "Version": "0.5.0",
+    "Version": "1.0.0",
     "License": "MIT",
     "Authors": [{"Name": "Synterra contributors"}]
   },
