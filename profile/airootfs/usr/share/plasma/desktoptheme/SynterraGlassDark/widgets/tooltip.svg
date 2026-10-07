@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="90" viewBox="0 0 300 90">
+<defs><linearGradient id="glass" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+<stop offset="0" stop-color="#819fb7" stop-opacity=".70"/>
+<stop offset=".08" stop-color="#476884" stop-opacity=".65"/>
+<stop offset=".48" stop-color="#253e58" stop-opacity=".58"/>
+<stop offset=".51" stop-color="#122d48" stop-opacity=".68"/>
+<stop offset="1" stop-color="#38566f" stop-opacity=".72"/>
+</linearGradient></defs><rect id="topleft" x="0" y="0" width="7" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="top" x="7" y="0" width="50" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="topright" x="57" y="0" width="7" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="left" x="0" y="7" width="7" height="50" fill="url(#glass)" opacity="1"/>
+<rect id="center" x="7" y="7" width="50" height="50" fill="url(#glass)" opacity="1"/>
+<rect id="right" x="57" y="7" width="7" height="50" fill="url(#glass)" opacity="1"/>
+<rect id="bottomleft" x="0" y="57" width="7" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="bottom" x="7" y="57" width="50" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="bottomright" x="57" y="57" width="7" height="7" fill="url(#glass)" opacity="1"/>
+<rect id="mask-topleft" x="80" y="0" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-top" x="87" y="0" width="50" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-topright" x="137" y="0" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-left" x="80" y="7" width="7" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-center" x="87" y="7" width="50" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-right" x="137" y="7" width="7" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-bottomleft" x="80" y="57" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-bottom" x="87" y="57" width="50" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-bottomright" x="137" y="57" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="hint-stretch-borders" x="0" y="75" width="1" height="1"/><rect id="hint-top-margin" x="10" y="75" width="7" height="7"/><rect id="hint-bottom-margin" x="10" y="75" width="7" height="7"/><rect id="hint-left-margin" x="10" y="75" width="7" height="7"/><rect id="hint-right-margin" x="10" y="75" width="7" height="7"/></svg>

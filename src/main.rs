@@ -1,5 +1,6 @@
 mod artwork;
 mod boot_preview;
+mod glass_modes;
 mod installer;
 mod signature;
 mod validate;

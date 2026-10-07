@@ -93,7 +93,7 @@ pub fn install() -> Result {
     if !Path::new(PAYLOAD).join("etc/skel").is_dir() {
         return Err("Installer desktop payload is missing.".into());
     }
-    println!("\nSynterra 1.0 (Prism) installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
+    println!("\nSynterra 1.1 Build 1105 installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
     let mut answer = String::new();
     io::stdin().read_line(&mut answer)?;
     if !answer.trim().is_empty() {
@@ -170,7 +170,7 @@ pub fn install() -> Result {
     fs::create_dir_all(target.join("etc/sddm.conf.d"))?;
     fs::write(
         target.join("etc/sddm.conf.d/10-synterra.conf"),
-        "[Theme]\nCurrent=breeze\n",
+        "[Theme]\nCurrent=SynterraGlass\n",
     )?;
     command(
         "systemctl",

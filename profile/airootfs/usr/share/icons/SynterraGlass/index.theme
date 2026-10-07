@@ -1,0 +1,17 @@
+[Icon Theme]
+Name=Synterra Glass
+Comment=Original glass desktop icons with complete Breeze fallback
+Inherits=breeze,hicolor
+Directories=scalable/apps,scalable/places
+[scalable/apps]
+Size=48
+Type=Scalable
+MinSize=16
+MaxSize=256
+Context=Applications
+[scalable/places]
+Size=48
+Type=Scalable
+MinSize=16
+MaxSize=256
+Context=Places

@@ -10,7 +10,7 @@ terminal-height: "70%"
 
 + image { left = 8% top = 8% width = 76 height = 76 file = "logo.png" }
 + label { left = 8%+96 top = 9% width = 70% height = 44 text = "Synterra" font = "Synterra Regular 32" color = "#f1f8ff" }
-+ label { left = 8%+98 top = 9%+48 width = 70% height = 24 text = "1.0 / PRISM" font = "Synterra Regular 16" color = "#c9dff5" }
++ label { left = 8%+98 top = 9%+48 width = 70% height = 24 text = "1.1 / BUILD 1105 / PRISM" font = "Synterra Regular 16" color = "#c9dff5" }
 + label { left = 8% top = 27% width = 84% height = 30 text = "Welcome home." font = "Synterra Regular 24" color = "#e7f4ff" }
 + boot_menu {
   left = 8% top = 35% width = 84% height = 44%

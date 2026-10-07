@@ -119,6 +119,31 @@ pub fn validate(repo: &Path) -> Result {
             "Missing palette group",
         )?;
     }
+    let dark = fs::read_to_string(root.join("usr/share/color-schemes/SynterraGlassDark.colors"))?;
+    require(
+        dark.contains("BackgroundNormal=24,36,50") && dark.contains("ForegroundNormal=232,242,253"),
+        "Dark glass palette missing",
+    )?;
+    for (theme, icons) in [
+        ("org.synterra.glass.desktop", "SynterraGlass"),
+        ("org.synterra.glass.dark.desktop", "SynterraGlassDark"),
+    ] {
+        let defaults = fs::read_to_string(root.join(format!(
+            "usr/share/plasma/look-and-feel/{theme}/contents/defaults"
+        )))?;
+        require(
+            defaults.contains("widgetStyle=SynterraGlass")
+                && defaults
+                    .lines()
+                    .any(|line| line == format!("Theme={icons}")),
+            "Synterra application/icon defaults missing",
+        )?;
+    }
+    require(
+        root.join("usr/share/sddm/themes/SynterraGlass/Main.qml")
+            .is_file(),
+        "Synterra sign-in theme missing",
+    )?;
     let manifest = fs::read_to_string(repo.join("profile/packages.txt"))?;
     let packages: Vec<_> = manifest
         .lines()

@@ -48,6 +48,7 @@
 #include <QSaveFile>
 #include <QtTest/QTest>
 #include "state.h"
+#include "../desktop/appearance.h"
 
 static const QUrl homeUrl(QStringLiteral("qrc:/surf/start.html"));
 
@@ -195,7 +196,7 @@ class Surf final : public QMainWindow {
         settings.setValue("darkToolbar", dark.isChecked()); applyStyle(); saveSession();
     }
     void applyStyle() {
-        const bool dark = privateMode || settings.value("darkToolbar", false).toBool();
+        const bool dark = privateMode || settings.value("darkToolbar", false).toBool() || GlassAppearance::dark();
         setStyleSheet(dark
             ? "QToolBar {background:#1d2940; color:#e6f0ff; padding:7px; spacing:6px;} QLineEdit {background:#273955; color:#f1f6ff; border:1px solid #5476a0; border-radius:10px; padding:8px 12px; min-width:180px;} QToolButton {color:#e6f0ff; padding:7px; border-radius:6px;} QToolButton:hover {background:#354b70;} QTabBar::tab {padding:9px 17px;}"
             : "QToolBar {background:#e7f0fa; padding:7px; spacing:6px; border-bottom:1px solid #bdcede;} QLineEdit {background:white; color:#19354e; border:1px solid #b6cee4; border-radius:10px; padding:8px 12px; min-width:180px;} QToolButton {padding:7px; border-radius:6px;} QToolButton:hover {background:#cfe4f6;} QTabBar::tab {padding:9px 17px;}");
@@ -353,9 +354,9 @@ public:
         menu->addSeparator();
         menu->addAction("Settings", this, [this] { preferences(); })->setEnabled(!privateMode);
         menu->addAction("About Surf", this, [this] {
-            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>1.0 · Prism</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
+            QMessageBox::about(this, "Synterra Surf", "<h2>Synterra Surf</h2><p>1.1 · Build 1105 · Prism</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>");
         });
-        applyStyle();
+        applyStyle(); GlassAppearance::watch(this, [this] { applyStyle(); });
         zoomLabel->setMinimumWidth(48); statusBar()->addPermanentWidget(zoomLabel);
         connect(address, &QLineEdit::returnPressed, this, [this] { navigate(); });
         connect(tabs, &QTabWidget::tabCloseRequested, this, [this](int index) { closeTab(index); });
@@ -491,6 +492,7 @@ int main(int argc, char **argv) {
         return 0;
     }
     QApplication app(argc, argv);
+    GlassAppearance::syncPalette();
     app.setOrganizationName("Synterra");
     app.setApplicationName("SynterraSurf");
     app.setApplicationDisplayName("Synterra Surf");

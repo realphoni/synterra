@@ -50,7 +50,7 @@ for username in "${users[@]}"; do
     arch-chroot "$target" chown -R "$username:$primary_group" "/home/$username"
 done
 mkdir -p "$target/etc/sddm.conf.d"
-printf '[Theme]\nCurrent=breeze\n' > "$target/etc/sddm.conf.d/10-synterra.conf"
+printf '[Theme]\nCurrent=SynterraGlass\n' > "$target/etc/sddm.conf.d/10-synterra.conf"
 previous_manager=$(readlink "$target/etc/systemd/system/display-manager.service" || true)
 if [[ ${previous_manager##*/} == cosmic-greeter.service ]]; then
     systemctl --root="$target" disable cosmic-greeter

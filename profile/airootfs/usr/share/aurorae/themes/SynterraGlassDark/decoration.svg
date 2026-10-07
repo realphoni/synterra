@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="100" viewBox="0 0 300 100">
+<defs><linearGradient id="glass" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+<stop offset="0" stop-color="#819fb7" stop-opacity=".70"/>
+<stop offset=".08" stop-color="#476884" stop-opacity=".65"/>
+<stop offset=".48" stop-color="#253e58" stop-opacity=".58"/>
+<stop offset=".51" stop-color="#122d48" stop-opacity=".68"/>
+<stop offset="1" stop-color="#38566f" stop-opacity=".72"/>
+</linearGradient></defs><rect id="decoration-topleft" x="0" y="0" width="7" height="34" fill="url(#glass)" opacity="1"/>
+<rect id="decoration-top" x="7" y="0" width="50" height="34" fill="url(#glass)" opacity="1"/>
+<rect id="decoration-topright" x="57" y="0" width="7" height="34" fill="url(#glass)" opacity="1"/>
+<rect id="decoration-left" x="0" y="34" width="7" height="50" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-center" x="7" y="34" width="50" height="50" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-right" x="57" y="34" width="7" height="50" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-bottomleft" x="0" y="84" width="7" height="7" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-bottom" x="7" y="84" width="50" height="7" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-bottomright" x="57" y="84" width="7" height="7" fill="#2b425c" opacity="0.82"/>
+<rect id="decoration-inactive-topleft" x="80" y="0" width="7" height="34" fill="url(#glass)" opacity="0.65"/>
+<rect id="decoration-inactive-top" x="87" y="0" width="50" height="34" fill="url(#glass)" opacity="0.65"/>
+<rect id="decoration-inactive-topright" x="137" y="0" width="7" height="34" fill="url(#glass)" opacity="0.65"/>
+<rect id="decoration-inactive-left" x="80" y="34" width="7" height="50" fill="#2b425c" opacity="0.72"/>
+<rect id="decoration-inactive-center" x="87" y="34" width="50" height="50" fill="#2b425c" opacity="0.72"/>
+<rect id="decoration-inactive-right" x="137" y="34" width="7" height="50" fill="#2b425c" opacity="0.72"/>
+<rect id="decoration-inactive-bottomleft" x="80" y="84" width="7" height="7" fill="#2b425c" opacity="0.72"/>
+<rect id="decoration-inactive-bottom" x="87" y="84" width="50" height="7" fill="#2b425c" opacity="0.72"/>
+<rect id="decoration-inactive-bottomright" x="137" y="84" width="7" height="7" fill="#2b425c" opacity="0.72"/>
+<rect id="mask-topleft" x="160" y="0" width="7" height="34" fill="#000000" opacity="1"/>
+<rect id="mask-top" x="167" y="0" width="50" height="34" fill="#000000" opacity="1"/>
+<rect id="mask-topright" x="217" y="0" width="7" height="34" fill="#000000" opacity="1"/>
+<rect id="mask-left" x="160" y="34" width="7" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-center" x="167" y="34" width="50" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-right" x="217" y="34" width="7" height="50" fill="#000000" opacity="1"/>
+<rect id="mask-bottomleft" x="160" y="84" width="7" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-bottom" x="167" y="84" width="50" height="7" fill="#000000" opacity="1"/>
+<rect id="mask-bottomright" x="217" y="84" width="7" height="7" fill="#000000" opacity="1"/>
+</svg>

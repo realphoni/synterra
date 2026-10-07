@@ -20,6 +20,7 @@ install -Dm755 "$repo/target/surf/synterra-surf" "$dest/airootfs/usr/local/bin/s
 cmake -S "$repo/desktop" -B "$repo/target/hub" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$repo/target/hub" --parallel 2
 install -Dm755 "$repo/target/hub/synterra-hub" "$dest/airootfs/usr/local/bin/synterra-hub"
+install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$dest/airootfs/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
 install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libexec/synterra-recover"
 theme="$dest/airootfs/usr/share/grub/themes/SynterraPrism"
 bash "$repo/scripts/build-grub-theme.sh" "$theme"
@@ -39,7 +40,7 @@ payload="$dest/airootfs/usr/share/synterra/install-overlay"
 mkdir -p "$payload/etc/skel" "$payload/usr/share"
 cp -a "$repo/profile/airootfs/etc/skel/." "$payload/etc/skel/"
 rm -rf "$payload/etc/skel/Desktop"
-for item in plasma aurorae color-schemes icons; do
+for item in plasma aurorae color-schemes icons sddm; do
     cp -a "$repo/profile/airootfs/usr/share/$item" "$payload/usr/share/"
 done
 install -Dm644 "$repo/profile/airootfs/usr/share/synterra/os-release" "$payload/usr/share/synterra/os-release"
@@ -52,6 +53,9 @@ install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-surf.desk
 install -Dm755 "$repo/target/hub/synterra-hub" "$payload/usr/local/bin/synterra-hub"
 install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-welcome" "$payload/usr/local/bin/synterra-welcome"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-hub.desktop" "$payload/usr/share/applications/synterra-hub.desktop"
+install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$payload/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
+install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-appearance" "$payload/usr/local/bin/synterra-appearance"
+install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-appearance.desktop" "$payload/usr/share/applications/synterra-appearance.desktop"
 cp "$repo/profile/packages.txt" "$dest/airootfs/usr/share/synterra/install-packages.txt"
 grep -Ev '^\s*(#|$)' "$repo/profile/packages.txt" >> "$dest/packages.x86_64"
 sort -u "$dest/packages.x86_64" -o "$dest/packages.x86_64"
@@ -68,7 +72,7 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="1.0.$(date -u +%Y%m%d)"
+iso_version="1.1.1105"
 file_permissions+=(
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
@@ -76,6 +80,10 @@ file_permissions+=(
   ["/usr/local/libexec/synterra-tools"]="0:0:755"
   ["/usr/local/bin/synterra-surf"]="0:0:755"
   ["/usr/local/bin/synterra-hub"]="0:0:755"
+  ["/usr/local/bin/synterra-appearance"]="0:0:755"
+  ["/usr/lib/qt6/plugins/styles/libSynterraGlass.so"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-appearance"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/lib/qt6/plugins/styles/libSynterraGlass.so"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-hub"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-welcome"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-surf"]="0:0:755"

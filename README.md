@@ -1,36 +1,47 @@
-# Synterra 1.0 (Prism)
+# Synterra 1.1 Build 1105 (Prism)
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.0 (Prism) release](https://github.com/realphoni/synterra/releases/tag/v1.0.0). The image is 2,407,563,264 bytes (about 2.24 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1105 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1105). The image is 2,407,563,264 bytes (about 2.24 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-1.0.20261003-x86_64.iso.part00 synterra-1.0.20261003-x86_64.iso.part01 > synterra-1.0.20261003-x86_64.iso
+cat synterra-1.1.1105-x86_64.iso.part00 synterra-1.1.1105-x86_64.iso.part01 > synterra-1.1.1105-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-1.0.20261003-x86_64.iso.part00+synterra-1.0.20261003-x86_64.iso.part01 synterra-1.0.20261003-x86_64.iso
+copy /b synterra-1.1.1105-x86_64.iso.part00+synterra-1.1.1105-x86_64.iso.part01 synterra-1.1.1105-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-1.0.20261003-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.1.1105-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `abc162802fd5461e17be5b85addc430af924fcf74cd531ff636c5dda8ab4f6f2`.
+Expected SHA-256: `73c8b74c34e8181aafa67277b63aafa8088269c034f782591e1004d96507498b`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Synterra 1.0
+## New in Synterra 1.1 Build 1105
+
+- **Light and Dark Glass** provide matching Plasma panels, Aurorae window frames and application colors. Light Glass remains the default. Open **Synterra Hub → Glass appearance**, choose a mode and apply it, or run `synterra-appearance light` / `synterra-appearance dark` as your desktop user.
+- **Synterra Glass application style** replaces Breeze as the default Qt 6 widget style. Original glossy buttons, tabs, inputs, selection controls and headers follow the selected palette. The plugin uses Qt's Fusion geometry and fallback drawing for remaining controls.
+- **Synterra Glass icons** become the active icon theme, with original glass artwork for the launcher, Surf, folders, terminal, appearance and calculator. Light/dark Breeze and hicolor remain fallback providers for icons outside this set.
+- **Synterra Glass sign-in** replaces the default SDDM theme with the Aurora wallpaper, orb and light/dark card. Installed accounts use SDDM's normal authentication; the live desktop still signs in automatically.
+- **Hub and Surf 1.1** follow Glass mode changes while open. An explicitly selected Surf dark toolbar and private windows remain dark.
+- Desktop, installer, browser and boot screens identify the system as **Synterra 1.1 Build 1105**, codenamed **Prism**.
+
+The appearance switch preserves your panel layout and wallpaper. Reopen other applications if they do not refresh their style immediately. Upstream KDE packages and fallback assets stay installed for compatibility.
+
+## Included from Synterra 1.0
 
 - **Synterra Hub** brings display, network, Bluetooth, phone integration, applications and update controls into one native desktop welcome window. It appears once on first sign-in; choose “Show this welcome when I sign in” to keep it. Open it anytime from the application menu.
 - **KDE Connect** pairs your phone with the desktop, **KCalc** adds a calculator, and **Bluedevil/BlueZ** provide Bluetooth controls. Pair devices explicitly through their setup screens.
@@ -79,27 +90,27 @@ Surf remains an early browser: extensions, a password manager and Firefox profil
 
 ### Update Surf on an existing Synterra installation
 
-Download `synterra-surf-1.0.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Synterra 1.0 release](https://github.com/realphoni/synterra/releases/tag/v1.0.0). Put both downloads in one folder and close Surf, then run:
+Download `synterra-surf-1.1.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Synterra 1.1 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1105). Put both downloads in one folder and close Surf, then run:
 
 ```bash
 sha256sum -c SHA256SUMS.surf
-tar -xzf synterra-surf-1.0.0-linux-x86_64.tar.gz
-cd synterra-surf-1.0.0-linux-x86_64
+tar -xzf synterra-surf-1.1.0-linux-x86_64.tar.gz
+cd synterra-surf-1.1.0-linux-x86_64
 sudo pacman -Syu qt6-webengine qt6-base
 sudo install -Dm755 synterra-surf /usr/local/bin/synterra-surf
 sudo install -Dm644 synterra-surf.desktop /usr/share/applications/synterra-surf.desktop
 sudo install -Dm644 synterra-surf.svg /usr/share/icons/hicolor/scalable/apps/synterra-surf.svg
 ```
 
-The archive targets current x86_64 Arch/Synterra systems. It requires Qt libraries and is not a standalone Windows executable. Existing profiles and bookmarks are retained. Build the archive locally with `bash scripts/package-surf.sh` after compiling Surf.
+The archive targets current x86_64 Arch/Synterra systems. It requires Qt libraries and is not a standalone Windows executable. It updates the browser only; the full Glass desktop is included in the 1.1 ISO. Existing profiles and bookmarks are retained. Build the archive locally with `bash scripts/package-surf.sh` after compiling Surf.
 
 ## Desktop
 
 - Aurora wallpaper by default; Graphite available in the wallpaper picker. Both original 3840 × 2160 PNGs are included unchanged.
-- Synterra Glass Plasma style: translucent blue glass, highlight edges, blur masks and Breeze fallback for controls.
-- Synterra Glass Aurorae window frames: smooth translucent side borders, pale title text, glossy buttons and a red close button.
+- Synterra Glass light/dark Plasma styles: translucent glass, highlight edges and blur masks.
+- Matching Synterra Glass Aurorae window frames: smooth translucent side borders, pale title text, glossy buttons and a red close button.
 - Bottom taskbar with launcher, pinned applications, tray, clock and Show Desktop.
-- Light application surfaces, blue selection colors, Noto Sans and Breeze icons. Wayland session, PipeWire audio, NetworkManager and VMware guest tools.
+- Synterra Glass Qt 6 application controls, light/dark palettes, blue selection colors, Noto Sans and original glass icons with upstream fallback. Wayland session, PipeWire audio, NetworkManager and VMware guest tools.
 
 ## Build inside the Manjaro VM
 
@@ -155,6 +166,7 @@ Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D a
 3. Network, sound, resize, clipboard and the wallpaper picker work.
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
 5. Verify the Synterra GRUB splash on UEFI. Reboot and test the Syslinux fallback on BIOS.
+6. Switch Light Glass → Dark Glass → Light Glass in Hub. Verify panels, frames and application colors change while your wallpaper and layout stay intact.
 
 The live account has no password; root administration is available through sudo. SSH is not enabled. The Rust installer wraps Archinstall and applies Synterra's desktop to the installed system. It uses a terminal wizard rather than a graphical partition editor. Release signing remains future work.
 
@@ -190,7 +202,7 @@ The helper checks the mounted root, installed packages and (on UEFI) the mounted
 ## Files
 
 - scripts/: verified-bootstrap builder, Arch builder, profile generator and theme validator.
-- desktop/: native Qt Synterra Hub.
+- desktop/: native Qt Synterra Hub, Glass widget plugin and preview checks.
 - `profile/packages.txt`: extra packages layered onto upstream Arch releng.
 - `profile/airootfs/`: branding, live-session configuration and desktop defaults.
 - `assets/wallpapers/`: supplied originals, copied to the image during profile generation.

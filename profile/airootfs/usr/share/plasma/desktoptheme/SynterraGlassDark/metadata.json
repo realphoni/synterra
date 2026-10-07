@@ -1,0 +1,11 @@
+{
+  "KPlugin": {
+    "Id": "SynterraGlassDark",
+    "Name": "Synterra Glass Dark",
+    "Description": "Blue glass with light edges and soft translucency",
+    "Version": "1.1.0",
+    "License": "MIT",
+    "Authors": [{"Name": "Synterra contributors"}]
+  },
+  "X-Plasma-API": "5.0"
+}

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(synterra_surf VERSION 1.0.0 LANGUAGES CXX)
+project(synterra_surf VERSION 1.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets WebEngineWidgets Test Network)
 qt_add_executable(synterra-surf main.cpp)

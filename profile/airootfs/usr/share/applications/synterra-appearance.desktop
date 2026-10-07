@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Synterra Glass appearance
+Comment=Choose light or dark glass in Synterra Hub
+Exec=synterra-hub --appearance
+Icon=preferences-desktop-theme
+Categories=Settings;DesktopSettings;
+StartupNotify=true

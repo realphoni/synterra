@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+case "${1:-}" in
+    light) scheme=SynterraGlass; package=org.synterra.glass.desktop ;;
+    dark) scheme=SynterraGlassDark; package=org.synterra.glass.dark.desktop ;;
+    *) echo 'Usage: synterra-appearance light|dark' >&2; exit 2 ;;
+esac
+[[ $EUID != 0 ]] || { echo 'Change appearance as your desktop user, without sudo.' >&2; exit 1; }
+for tool in plasma-apply-lookandfeel plasma-apply-colorscheme plasma-apply-desktoptheme kwriteconfig6; do
+    command -v "$tool" >/dev/null || { echo "Missing desktop tool: $tool" >&2; exit 1; }
+done
+# Applying defaults keeps the existing desktop layout and wallpaper.
+plasma-apply-lookandfeel -a "$package"
+plasma-apply-colorscheme "$scheme"
+plasma-apply-desktoptheme "$scheme"
+kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle SynterraGlass
+kwriteconfig6 --file kdeglobals --group Icons --key Theme "$scheme"
+config_root=${XDG_CONFIG_HOME:-$HOME/.config}
+mkdir -p "$config_root/Synterra"
+printf '[Appearance]\nmode=%s\n' "$1" > "$config_root/Synterra/appearance.conf"
+echo 'Synterra Glass applied. Reopen existing applications if their style has not refreshed.'

@@ -103,12 +103,12 @@ fixed=Noto Sans Mono,10,-1,5,50,0,0,0,0,0
 font=Noto Sans,10,-1,5,50,0,0,0,0,0
 
 [Icons]
-Theme=breeze
+Theme=SynterraGlass
 
 [KDE]
 LookAndFeelPackage=org.synterra.glass.desktop
 SingleClick=false
-widgetStyle=Breeze
+widgetStyle=SynterraGlass
 
 [WM]
 activeBackground=80,132,182

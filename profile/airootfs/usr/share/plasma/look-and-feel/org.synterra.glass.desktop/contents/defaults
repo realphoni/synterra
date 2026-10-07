@@ -1,11 +1,11 @@
 [kdeglobals][KDE]
-widgetStyle=Breeze
+widgetStyle=SynterraGlass
 
 [kdeglobals][General]
 ColorScheme=SynterraGlass
 
 [kdeglobals][Icons]
-Theme=breeze
+Theme=SynterraGlass
 
 [plasmarc][Theme]
 name=SynterraGlass

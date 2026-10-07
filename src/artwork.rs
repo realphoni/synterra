@@ -62,7 +62,7 @@ fn svg(body: &str, width: i32, height: i32) -> String {
     )
 }
 
-fn write(path: &Path, text: &str) -> Result {
+pub(crate) fn write(path: &Path, text: &str) -> Result {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
@@ -70,8 +70,8 @@ fn write(path: &Path, text: &str) -> Result {
     Ok(())
 }
 
-type Ini = BTreeMap<String, BTreeMap<String, String>>;
-fn parse_ini(text: &str) -> Ini {
+pub(crate) type Ini = BTreeMap<String, BTreeMap<String, String>>;
+pub(crate) fn parse_ini(text: &str) -> Ini {
     let mut result: Ini = BTreeMap::new();
     let mut section = String::new();
     for line in text.lines().map(str::trim) {
@@ -86,7 +86,7 @@ fn parse_ini(text: &str) -> Ini {
     }
     result
 }
-fn ini_text(ini: &Ini) -> String {
+pub(crate) fn ini_text(ini: &Ini) -> String {
     let mut text = String::new();
     for (section, values) in ini {
         text.push_str(&format!("[{section}]\n"));
@@ -207,6 +207,7 @@ pub fn generate(repo: &Path) -> Result {
         }
     }
     write(&defaults, &ini_text(&settings))?;
+    crate::glass_modes::generate(repo)?;
     println!("Generated Synterra glass style, Aurorae frames, color scheme and launcher orb.");
     Ok(())
 }
