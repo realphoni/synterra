@@ -1,4 +1,4 @@
-# Synterra 1.1 Build 1105 (Prism)
+# Synterra
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
