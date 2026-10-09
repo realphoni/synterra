@@ -1,10 +1,10 @@
 NAME="Synterra"
-PRETTY_NAME="Synterra 1.1 Build 1105"
+PRETTY_NAME="Synterra 1.1 Build 1130"
 ID=synterra
 ID_LIKE=arch
 VERSION_ID=1.1
-VERSION="1.1 Build 1105 (Prism)"
-BUILD_ID=1105
+VERSION="1.1 Build 1130 (Prism)"
+BUILD_ID=1130
 VERSION_CODENAME=prism
 ANSI_COLOR="38;2;125;183;255"
 LOGO=synterra

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Surf JavaScript check</title>
+<style>body{font:18px sans-serif;padding:32px}button,a{display:inline-block;padding:16px;margin:12px}#result{color:#145b88}</style>
+<h1>Synterra Surf website checks</h1>
+<p id="result">Running async JavaScript…</p>
+<button id="popup" onclick="window.open('/popup', '_blank')">Open a tab</button>
+<a id="background" href="/popup" target="_blank">Open in background</a>
+<script>
+async function check() {
+  const {message} = await fetch('/data').then(response => response.json());
+  localStorage.setItem('surf-fixture', message);
+  const values = [1, 2, 3].map(value => value ** 2);
+  document.querySelector('#result').textContent = `${message}: ${values.join(', ')}`;
+  document.body.dataset.ready = localStorage.getItem('surf-fixture') === message && values.at(-1) === 9 ? 'yes' : 'no';
+}
+check().catch(error => { document.body.dataset.ready = 'no'; document.querySelector('#result').textContent = error.message; });
+setTimeout(() => { document.body.dataset.popupBlocked = window.open('/popup', '_blank') ? 'no' : 'yes'; }, 150);
+</script></html>

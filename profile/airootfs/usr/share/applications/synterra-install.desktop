@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Install Synterra
-Comment=Guided installation of Synterra 1.1 Build 1105 (Prism)
+Comment=Guided installation of Synterra 1.1 Build 1130 (Prism)
 Exec=synterra-install
 Icon=synterra
 Categories=System;

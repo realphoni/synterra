@@ -1,32 +1,32 @@
-# Build status — 2026-10-07
+# Build status — 2026-10-09
 
-Synterra 1.1 Build 1105 (Prism) built successfully with official Archiso in `SynterraBuild`.
+Synterra 1.1 Build 1130 (Prism) built successfully with official Archiso in SynterraBuild.
 
-- Image: `synterra-1.1.1105-x86_64.iso`.
-- Size: 2,407,563,264 bytes (about 2.24 GiB).
-- SHA-256: `73c8b74c34e8181aafa67277b63aafa8088269c034f782591e1004d96507498b`.
-- Release: `v1.1.1105`, distributed in two ISO parts with whole-image and part checksums, a Surf 1.1 update archive/checksum and screenshots.
+- Image: synterra-1.1.1130-x86_64.iso.
+- Size: 2,412,625,920 bytes (about 2.25 GiB).
+- SHA-256: 0f6a9e4e5a994fd4a33c984b9223b45e51816f2c4276b73c76b210d8aaadb950.
+- Release: v1.1.1130, distributed in two ISO parts with whole-image and part checksums, a Surf 1.1.1 update archive/checksum and screenshots.
 
 ## Changes
 
-Light and Dark Glass now cover Plasma surfaces, Aurorae decorations and application colors. Synterra Glass replaces Breeze as the default Qt 6 widget style, using original painting for glossy buttons, inputs, tabs, headers and selection controls. Qt Fusion supplies geometry and fallback drawing for remaining controls. Original glass launcher, Surf, folder, terminal, appearance and calculator icons form the active Synterra Glass icon theme; Light/dark Breeze and hicolor supply remaining icons.
+This is a browser-focused release. Surf 1.1.1 adds loading progress, Stop/Reload, per-tab muting, a recoverable failed-load/web-process-crash notice and per-tab Chromium developer tools. Page updates preserve address-bar edits; selecting another tab updates its address. Ctrl+Shift+R reloads while bypassing HTTP cache.
 
-Synterra Hub provides a native appearance dialog, backed by `synterra-appearance light|dark`. Hub and Surf follow live palette changes, including atomic configuration replacement. The original Aurora and Graphite wallpapers are unchanged. A new Synterra Glass SDDM login theme includes light/dark cards and routes credentials through SDDM's normal authentication API. The live account still signs in automatically.
+User-triggered JavaScript windows open using the original request without racing a Home load. Opener relationships are retained, script-opened tabs can close themselves, and background links leave the current tab selected. Automatic popups stay blocked and display a status message. Developer tools share their window's profile, including the isolated private profile, and are destroyed before the inspected tab/profile.
 
-OS, installer, browser, desktop and boot branding identify Synterra 1.1 Build 1105, codenamed Prism. Existing Surf, Hub, installer recovery, GRUB splash, Bluetooth and KDE Connect features remain included. Standard Fastfetch remains available without a custom preset or logo.
+Light/Dark Glass, Synterra's widget/icon/login themes, Hub, installer recovery, GRUB artwork and the supplied wallpapers remain included. OS, installer, browser, desktop, login and boot branding identify Build 1130. This release does not redesign the desktop or change installation behavior.
 
 ## Validation
 
-Rust source validation and installer target/greeter regressions passed. Bash and GRUB syntax checks passed. Native Surf, Hub and the Glass style plugin compiled. Real plugin previews passed in both palettes, including text contrast and keyboard/pointer controls. The live palette watcher passed atomic light-to-dark configuration replacement. Sandboxed unprivileged Surf tests passed rendering, find results, tabs, private state, downloads, fullscreen/Escape, zoom, bookmark search/removal and PDF export.
+Rust source validation and installer target/greeter regressions passed. The final Surf and Hub binaries and Glass style plugin compiled. Surf's URL, port/path, scheme rejection, history cap/deduplication, credential stripping and session/private self-tests passed.
 
-The actual login QML rendered with a session-model fixture; password masking, correct authentication argument routing and clearing the field on failed authentication passed. This is a UI/proxy test, not an installed PAM authentication test.
+The final browser ran as an unprivileged user with Chromium sandboxing enabled, isolated test configuration and a virtual X11 display. Both normal and private runs passed real rendering, find results, tab closure, an HTTP download fixture, fullscreen/Escape, zoom, bookmark search/removal and PDF export. The new HTTP/JavaScript fixture passed async/await, fetch/JSON, DOM and local-storage checks, automatic popup blocking, actual mouse-triggered popup opening, opener/close callbacks and Ctrl-click background tabs. Tab muting stayed isolated; address editing and new-tab address replacement passed. F12 attached the inspector to the correct page/profile, closing it detached it, and closing its tab removed its inspector. Stop did not produce an error; a failed HTTP load and an actual killed renderer recovered on reload.
 
-The finished ISO was mounted read-only. Build identity, default widget/icon styles, both desktop and window themes, the login theme, executable live/installed payloads and original wallpaper hashes passed inspection. Both firmware menus rendered from the final ISO. The two release parts were verified to reconstruct its SHA-256.
+The finished ISO was mounted read-only. Both firmware boot files and GRUB syntax passed. Live and installed payloads contain Build 1130 branding and the exact tested Surf binary. Executable helpers/plugins, Glass defaults, both themes, login QML and original wallpaper hashes passed inspection. BIOS Syslinux and UEFI GRUB menus rendered from this ISO and were visually inspected. The download parts were streamed together and verified against the whole-image SHA-256 without creating a duplicate ISO.
 
-An isolated QEMU UEFI VM with 3 GiB RAM, no network and no hard disk reached the Plasma desktop, Aurora wallpaper, bottom taskbar and Synterra Hub. The final live image completed Light → Dark → Light switching, including panel, window frames and the open Hub. A selected Graphite wallpaper was retained during the Dark Glass switch; Aurora was then selected and remained in place when returning to Light Glass. Screenshots were visually inspected.
+An isolated QEMU UEFI VM with 3 GiB RAM, no network and no hard disk reached the Plasma desktop, Aurora wallpaper, bottom taskbar and Synterra Hub. Surf launched from the final ISO and rendered its actual homepage with Build 1130 branding and Glass controls. Its initial load was slow under software emulation. Live screenshots were visually inspected; browser behavior regressions above ran natively on the build host.
 
 ## Remaining validation
 
-A complete installation to a disposable VM disk, installed login authentication, encrypted installations, BIOS desktop startup, wider hardware compatibility, physical Bluetooth/KDE Connect pairing and broad website/download-cancellation behavior still need testing. Release signing is future work.
+A complete installation to a disposable VM disk, installed login authentication, encrypted installations, BIOS desktop startup, wider hardware compatibility, physical Bluetooth/KDE Connect pairing and broad website/download-cancellation behavior still need testing. JavaScript tests use local fixtures; they do not establish compatibility with every sign-in provider or website. Release signing is future work.
 
 At Archinstall completion choose Exit and wait for Synterra finalization before rebooting. If a guard fails, keep the live session running and inspect the reported condition.

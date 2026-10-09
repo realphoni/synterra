@@ -24,7 +24,7 @@ Rectangle {
             id: column; anchors.centerIn: parent; width: parent.width - 64; spacing: 15
             Image { Layout.alignment: Qt.AlignHCenter; source: "file://" + config.logo; sourceSize.width: 72; sourceSize.height: 72 }
             Label { text: "Synterra 1.1"; color: root.ink; font.pixelSize: 28; Layout.alignment: Qt.AlignHCenter }
-            Label { text: "Build 1105 · Prism"; color: root.ink; opacity: .75; Layout.alignment: Qt.AlignHCenter }
+            Label { text: "Build 1130 · Prism"; color: root.ink; opacity: .75; Layout.alignment: Qt.AlignHCenter }
             Label { text: qsTr("Username"); color: root.ink }
             TextField {
                 id: userName; objectName: "username"; Layout.fillWidth: true; text: userModel.lastUser; color: root.ink

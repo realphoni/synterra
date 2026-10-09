@@ -2,35 +2,47 @@
 
 An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
 
+Current release: **Synterra 1.1 Build 1130 (Prism)**, a Surf-focused update.
+
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1105 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1105). The image is 2,407,563,264 bytes (about 2.24 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1130 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1130). The image is 2,412,625,920 bytes (about 2.25 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-1.1.1105-x86_64.iso.part00 synterra-1.1.1105-x86_64.iso.part01 > synterra-1.1.1105-x86_64.iso
+cat synterra-1.1.1130-x86_64.iso.part00 synterra-1.1.1130-x86_64.iso.part01 > synterra-1.1.1130-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-1.1.1105-x86_64.iso.part00+synterra-1.1.1105-x86_64.iso.part01 synterra-1.1.1105-x86_64.iso
+copy /b synterra-1.1.1130-x86_64.iso.part00+synterra-1.1.1130-x86_64.iso.part01 synterra-1.1.1130-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-1.1.1105-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.1.1130-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `73c8b74c34e8181aafa67277b63aafa8088269c034f782591e1004d96507498b`.
+Expected SHA-256: `0f6a9e4e5a994fd4a33c984b9223b45e51816f2c4276b73c76b210d8aaadb950`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Synterra 1.1 Build 1105
+## New in Synterra 1.1 Build 1130
+
+- **Surf 1.1.1** adds a thin loading indicator and a Reload button that becomes Stop while a page loads. Stopping a load no longer displays a connection error. Failed loads and crashed web processes show a dismissible recovery bar with Reload.
+- **Mute individual tabs** from Menu or with Ctrl+Shift+M. A muted tab displays its own speaker icon; other tabs keep playing.
+- **JavaScript-opened tabs** retain the original window request, allowing script-created content and opener callbacks. Background links keep the current tab selected, and script-opened tabs can close themselves. Automatic popups remain blocked, with a visible status message.
+- **Developer tools** open with F12 or Ctrl+Shift+I, including Chromium's JavaScript console and page inspector. Each inspector belongs to its tab and closes with it. Private inspectors use the same isolated profile as their private window.
+- **Address editing** survives page-title, loading and zoom updates. Ctrl+Shift+R reloads a page while bypassing its HTTP cache.
+
+The Light/Dark Glass desktop, supplied wallpapers and installer remain included. This release changes browser behavior and build branding.
+
+## Included from Synterra 1.1 Build 1105
 
 - **Light and Dark Glass** provide matching Plasma panels, Aurorae window frames and application colors. Light Glass remains the default. Open **Synterra Hub → Glass appearance**, choose a mode and apply it, or run `synterra-appearance light` / `synterra-appearance dark` as your desktop user.
 - **Synterra Glass application style** replaces Breeze as the default Qt 6 widget style. Original glossy buttons, tabs, inputs, selection controls and headers follow the selected palette. The plugin uses Qt's Fusion geometry and fallback drawing for remaining controls.
@@ -81,21 +93,24 @@ Use the Menu button for history, settings and private windows. Session restorati
 | Ctrl+F / Escape | Find in page / close find bar or stop loading |
 | Ctrl+H / Ctrl+J / Ctrl+D | History / downloads / bookmarks |
 | Ctrl+R / Alt+Left / Alt+Right | Reload / back / forward |
+| Ctrl+Shift+R | Reload bypassing HTTP cache |
+| Ctrl+Shift+M | Mute / unmute this tab |
+| F12 / Ctrl+Shift+I | Open this tab's developer tools |
 | Ctrl+P / F11 | Save page as PDF / toggle full screen |
 | Ctrl++ / Ctrl+- / Ctrl+0 | Zoom in / zoom out / reset zoom |
 
 Private windows use a separate [Qt off-the-record profile](https://doc.qt.io/qt-6/qwebengineprofile.html#QWebEngineProfile), with memory-only cookies/cache and no Surf history or session persistence. Downloads and explicitly saved bookmarks remain on disk. Private browsing does not hide traffic from websites or network operators. Website permissions still ask, and normal certificate validation and Chromium sandboxing stay enabled.
 
-Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Tests cover address parsing, history limits/deduplication, credential stripping, session/private isolation, actual page rendering, Ctrl+F/find results, tab closure, an HTTP download fixture, F11/Escape, zoom, bookmark search/removal and Ctrl+P PDF export. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
+Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Local Chromium tests cover async JavaScript, fetch/JSON, DOM updates, local storage, user-triggered and blocked popups, opener/close callbacks, background tabs, mute isolation, address editing, developer-tool cleanup and stopped/failed/crashed-page recovery. Earlier URL, history, session/private, download, find, fullscreen, bookmark and PDF checks are retained. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
 
 ### Update Surf on an existing Synterra installation
 
-Download `synterra-surf-1.1.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Synterra 1.1 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1105). Put both downloads in one folder and close Surf, then run:
+Download `synterra-surf-1.1.1-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Build 1130 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1130). Put both downloads in one folder and close Surf, then run:
 
 ```bash
 sha256sum -c SHA256SUMS.surf
-tar -xzf synterra-surf-1.1.0-linux-x86_64.tar.gz
-cd synterra-surf-1.1.0-linux-x86_64
+tar -xzf synterra-surf-1.1.1-linux-x86_64.tar.gz
+cd synterra-surf-1.1.1-linux-x86_64
 sudo pacman -Syu qt6-webengine qt6-base
 sudo install -Dm755 synterra-surf /usr/local/bin/synterra-surf
 sudo install -Dm644 synterra-surf.desktop /usr/share/applications/synterra-surf.desktop

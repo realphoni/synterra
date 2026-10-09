@@ -2,5 +2,5 @@
   <image href="background.png" width="640" height="480" preserveAspectRatio="xMidYMid slice"/>
   <image href="logo.png" x="40" y="36" width="76" height="76"/>
   <text x="132" y="70" font-family="DejaVu Sans" font-size="31" fill="#f1f8ff">Synterra 1.1</text>
-  <text x="134" y="98" font-family="DejaVu Sans" font-size="14" letter-spacing="3" fill="#c9dff5">BUILD 1105 · PRISM</text>
+  <text x="134" y="98" font-family="DejaVu Sans" font-size="14" letter-spacing="3" fill="#c9dff5">BUILD 1130 · PRISM</text>
 </svg>
