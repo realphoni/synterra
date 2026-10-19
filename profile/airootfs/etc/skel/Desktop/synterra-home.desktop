@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Home
+Exec=dolphin
+Icon=user-home
+Terminal=false

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ ${XDG_SESSION_DESKTOP:-} == synaqua ]] || exit 0
+exec systemctl --user start synaqua-shell.service

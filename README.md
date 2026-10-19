@@ -1,38 +1,48 @@
 # Synterra
 
-An Arch-based x86_64 live distribution with an original Aero-inspired KDE Plasma desktop.
+An Arch-based x86_64 live distribution with Synaqua, our new Aero-inspired desktop-shell preview using KWin/Plasma services.
 
-Current release: **Synterra 1.1 Build 1130 (Prism)**, a Surf-focused update.
+Current release: **Synterra 1.1 Build 1165 (Prism)** with the first **Synaqua 0.1 desktop-shell preview**. [Synaqua guide](docs/SYNAQUA.md).
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1130 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1130). The image is 2,412,625,920 bytes (about 2.25 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1165 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1165). The image is 2,596,274,176 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-1.1.1130-x86_64.iso.part00 synterra-1.1.1130-x86_64.iso.part01 > synterra-1.1.1130-x86_64.iso
+cat synterra-1.1.1165-x86_64.iso.part00 synterra-1.1.1165-x86_64.iso.part01 > synterra-1.1.1165-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-1.1.1130-x86_64.iso.part00+synterra-1.1.1130-x86_64.iso.part01 synterra-1.1.1130-x86_64.iso
+copy /b synterra-1.1.1165-x86_64.iso.part00+synterra-1.1.1165-x86_64.iso.part01 synterra-1.1.1165-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-1.1.1130-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.1.1165-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `0f6a9e4e5a994fd4a33c984b9223b45e51816f2c4276b73c76b210d8aaadb950`.
+Expected SHA-256: `ac025a37c68dcb0ada245595dfbf77b828f38ff53c7a57d7f11f5356e4dfb3b2`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Synterra 1.1 Build 1130
+## New in Synterra 1.1 Build 1165
+
+- **Synaqua 0.1 preview** begins our own desktop shell: a floating glass dock, centered Start button and pinned applications on both sides, based on the supplied sketch.
+- **Searchable Start menu** lists installed apps, supports keyboard navigation and launches standard desktop entries through KIO. Stars add or remove up to eight persistent dock pins.
+- **Running-window controls**, Home and Surf desktop shortcuts, a clock, matching settings shortcuts, Show Desktop, Glass switching, screen locking and session controls make the first shell usable.
+- **Separate session and layout** provide Synaqua (Preview) at sign-in while preserving the normal Plasma session and its panel layout. This first version uses KWin/Plasma session and desktop services; it does not yet replace the entire KDE stack.
+- **Installer continuation** opens guarded recovery when its existing installation target is mounted, improving the path for finishing a partial install without running the partitioner again. Account checks accept a trailing home-directory slash and the default UID upper boundary, and reject a symlinked `/home` ancestor.
+
+See [Synaqua's controls and current limits](docs/SYNAQUA.md) and [build validation](docs/BUILD-STATUS.md). This is an early Synaqua preview; its current limits and actual validation are documented below.
+
+## Included from Synterra 1.1 Build 1130
 
 - **Surf 1.1.1** adds a thin loading indicator and a Reload button that becomes Stop while a page loads. Stopping a load no longer displays a connection error. Failed loads and crashed web processes show a dismissible recovery bar with Reload.
 - **Mute individual tabs** from Menu or with Ctrl+Shift+M. A muted tab displays its own speaker icon; other tabs keep playing.
@@ -103,7 +113,9 @@ Private windows use a separate [Qt off-the-record profile](https://doc.qt.io/qt-
 
 Surf remains an early browser: extensions, a password manager and Firefox profile migration are not implemented. Local Chromium tests cover async JavaScript, fetch/JSON, DOM updates, local storage, user-triggered and blocked popups, opener/close callbacks, background tabs, mute isolation, address editing, developer-tool cleanup and stopped/failed/crashed-page recovery. Earlier URL, history, session/private, download, find, fullscreen, bookmark and PDF checks are retained. Broad website compatibility, download cancellation and full desktop integration still need manual testing.
 
-### Update Surf on an existing Synterra installation
+### Update Surf 1.1.1 on an earlier Synterra installation
+
+Build 1165 already includes Surf 1.1.1. The archive below updates the browser on earlier installations; it does not install Synaqua or upgrade the OS build.
 
 Download `synterra-surf-1.1.1-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Build 1130 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1130). Put both downloads in one folder and close Surf, then run:
 
@@ -164,7 +176,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host with `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `qt6-svg`, `grub`, `librsvg` and `ttf-dejavu` installed:
+On a native Arch build host, install `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `qt6-svg`, `qt6-declarative`, `qt6-wayland`, `layer-shell-qt`, `kservice`, `kio`, `kglobalaccel`, `kwindowsystem`, `kirigami`, `plasma-workspace`, `plasma-desktop`, `grub`, `librsvg` and `ttf-dejavu`, then run:
 
 ```bash
 sudo bash scripts/build-arch.sh
@@ -176,9 +188,9 @@ sudo bash scripts/build-arch.sh
 
 Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D acceleration enabled). Keep Manjaro as the builder. Verify:
 
-1. The live session enters Plasma automatically as `live`.
-2. Aurora is visible, the panel is at the bottom, and glass frames have working minimize/maximize/close buttons.
-3. Network, sound, resize, clipboard and the wallpaper picker work.
+1. The live session enters Synaqua (Preview) automatically as `live`.
+2. Aurora and the desktop shortcuts are visible, the floating dock has a centered Start button, and glass frames have working minimize/maximize/close buttons.
+3. Test Start search, pinning, running-window controls, network/sound settings, resize, clipboard and the wallpaper picker.
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
 5. Verify the Synterra GRUB splash on UEFI. Reboot and test the Syslinux fallback on BIOS.
 6. Switch Light Glass → Dark Glass → Light Glass in Hub. Verify panels, frames and application colors change while your wallpaper and layout stay intact.
@@ -193,7 +205,7 @@ Choose the target disk, partition layout, timezone, bootloader and a regular adm
 
 **At Archinstall's completion screen choose Exit, not Reboot.** The wrapper then copies Synterra's desktop and GRUB themes, wallpapers and user defaults, applies branding and enables the desktop services. Wait for **Synterra installation finished**, then shut down, eject the live ISO and boot from the installed disk.
 
-Installed systems use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. This installer is experimental; a full installation on a disposable VM disk still needs validation.
+Installed systems select Synaqua (Preview) by default, with Plasma (Wayland) available in the sign-in session selector. They use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. This installer is experimental; a full installation on a disposable VM disk still needs validation.
 
 ## GRUB splash
 
@@ -201,9 +213,11 @@ The splash uses your original Aurora wallpaper unchanged. Arrow keys select an e
 
 Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, including when `/boot` is separate from an encrypted root. Settings live in `/etc/default/grub.d/10-synterra.cfg`; `/etc/default/grub` retains its existing disk and kernel options. To refresh the theme on an installed Synterra GRUB system, run `sudo /usr/local/libexec/synterra-grub-setup`.
 
-## Recover a Prism 0.2 greeter conflict
+## Finish a partial installation
 
-The published 0.2 ISO can stop with `display-manager.service already exists ... cosmic-greeter.service` if Archinstall selected COSMIC's greeter. The installer source is corrected: the base stage leaves greeter selection to Archinstall, then Synterra finalization explicitly selects SDDM. The existing ISO assets have not been rebuilt with this fix.
+The recovery helper can finish a mounted partial installation. Build 1165 opens it when the installation target is already mounted, without running the partitioner again. It asks for `REPAIR` before making changes.
+
+The older published 0.2 ISO can stop with `display-manager.service already exists ... cosmic-greeter.service` if Archinstall selected COSMIC's greeter. The installer source is corrected: the base stage leaves greeter selection to Archinstall, then Synterra finalization explicitly selects SDDM. The existing ISO assets have not been rebuilt with this fix.
 
 For an installation still mounted at `/mnt/synterra-install`, run this from a new terminal in the same live session:
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Repair a mounted Prism 0.2 installation without repartitioning or formatting.
+# Finish a mounted partial installation without repartitioning or formatting.
 set -Eeuo pipefail
 trap 'echo "Recovery stopped at line $LINENO. Keep the live ISO running; inspect the error above." >&2' ERR
 target=/mnt/synterra-install
@@ -29,7 +29,7 @@ echo 'This will select SDDM, apply Synterra desktop defaults and regenerate fsta
 echo 'No partitions will be created or formatted. Existing fstab will be backed up.'
 read -r -p 'Type REPAIR to continue: ' confirmation
 [[ $confirmation == REPAIR ]] || { echo 'Cancelled.'; exit 0; }
-mapfile -t users < <(awk -F: '$3 >= 1000 && $3 < 60000 && $1 != "live" && $6 == "/home/" $1 {print $1}' "$target/etc/passwd")
+mapfile -t users < <(awk -F: '{ home=$6; sub(/\/+$/, "", home) } $3 >= 1000 && $3 <= 60000 && $1 != "live" && home == "/home/" $1 {print $1}' "$target/etc/passwd")
 if (( ${#users[@]} == 0 )); then
     read -r -p 'Create an administrator account. Username: ' username
     [[ $username =~ ^[a-z_][a-z0-9_-]{0,31}$ && $username != live ]] || { echo 'Invalid username.' >&2; exit 1; }
@@ -51,6 +51,11 @@ for username in "${users[@]}"; do
 done
 mkdir -p "$target/etc/sddm.conf.d"
 printf '[Theme]\nCurrent=SynterraGlass\n' > "$target/etc/sddm.conf.d/10-synterra.conf"
+if [[ -f $target/usr/share/wayland-sessions/synaqua.desktop ]]; then
+    mkdir -p "$target/var/lib/sddm"
+    arch-chroot "$target" kwriteconfig6 --file /var/lib/sddm/state.conf --group Last --key Session /usr/share/wayland-sessions/synaqua.desktop
+    arch-chroot "$target" chown sddm:sddm /var/lib/sddm/state.conf
+fi
 previous_manager=$(readlink "$target/etc/systemd/system/display-manager.service" || true)
 if [[ ${previous_manager##*/} == cosmic-greeter.service ]]; then
     systemctl --root="$target" disable cosmic-greeter

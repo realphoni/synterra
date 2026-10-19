@@ -416,7 +416,7 @@ public:
         menu->addSeparator();
         menu->addAction("Settings", this, [this] { preferences(); })->setEnabled(!privateMode);
         menu->addAction("About Surf", this, [this] {
-            QMessageBox::about(this, "Synterra Surf", QString("<h2>Synterra Surf %1</h2><p>Synterra 1.1 · Build 1130 · Prism</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+Shift+M mute · F12 developer tools<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>").arg(QStringLiteral(SURF_VERSION)));
+            QMessageBox::about(this, "Synterra Surf", QString("<h2>Synterra Surf %1</h2><p>Synterra 1.1 · Build 1165 · Prism</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+Shift+M mute · F12 developer tools<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>").arg(QStringLiteral(SURF_VERSION)));
         });
         applyStyle(); GlassAppearance::watch(this, [this] { applyStyle(); });
         zoomLabel->setMinimumWidth(48); statusBar()->addPermanentWidget(zoomLabel);

@@ -22,6 +22,18 @@ cmake --build "$repo/target/hub" --parallel 2
 install -Dm755 "$repo/target/hub/synterra-hub" "$dest/airootfs/usr/local/bin/synterra-hub"
 install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$dest/airootfs/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
 install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libexec/synterra-recover"
+cmake -S "$repo/synaqua" -B "$repo/target/synaqua" -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build "$repo/target/synaqua" --parallel 2
+install -Dm755 "$repo/target/synaqua/synaqua-shell" "$dest/airootfs/usr/local/bin/synaqua-shell"
+# Keep upstream desktop views, lock-screen and logout components with their
+# original licenses; Synaqua's dock/launcher and session layout are separate.
+shell="$dest/airootfs/usr/share/plasma/shells/org.synterra.synaqua"
+mkdir -p "$shell"
+cp -a /usr/share/plasma/shells/org.kde.plasma.desktop/. "$shell/"
+install -m644 "$repo/synaqua/shell-metadata.json" "$shell/metadata.json"
+for variant in org.synterra.glass.desktop org.synterra.glass.dark.desktop; do
+    install -m644 "$repo/synaqua/desktop-layout.js" "$dest/airootfs/usr/share/plasma/look-and-feel/$variant/contents/layouts/org.synterra.synaqua-layout.js"
+done
 theme="$dest/airootfs/usr/share/grub/themes/SynterraPrism"
 bash "$repo/scripts/build-grub-theme.sh" "$theme"
 install -m644 "$theme/bios-splash.png" "$dest/syslinux/splash.png"
@@ -39,7 +51,7 @@ done
 payload="$dest/airootfs/usr/share/synterra/install-overlay"
 mkdir -p "$payload/etc/skel" "$payload/usr/share"
 cp -a "$repo/profile/airootfs/etc/skel/." "$payload/etc/skel/"
-rm -rf "$payload/etc/skel/Desktop"
+rm -f "$payload/etc/skel/Desktop/synterra-install.desktop"
 for item in plasma aurorae color-schemes icons sddm; do
     cp -a "$repo/profile/airootfs/usr/share/$item" "$payload/usr/share/"
 done
@@ -56,6 +68,19 @@ install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-hub.deskt
 install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$payload/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
 install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-appearance" "$payload/usr/local/bin/synterra-appearance"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-appearance.desktop" "$payload/usr/share/applications/synterra-appearance.desktop"
+install -Dm755 "$repo/target/synaqua/synaqua-shell" "$payload/usr/local/bin/synaqua-shell"
+for helper in start-synaqua; do
+    install -Dm755 "$repo/profile/airootfs/usr/local/bin/$helper" "$payload/usr/local/bin/$helper"
+done
+for helper in synterra-plasma-shell synaqua-autostart; do
+    install -Dm755 "$repo/profile/airootfs/usr/local/libexec/$helper" "$payload/usr/local/libexec/$helper"
+done
+install -Dm644 "$repo/profile/airootfs/usr/share/wayland-sessions/synaqua.desktop" "$payload/usr/share/wayland-sessions/synaqua.desktop"
+install -Dm644 "$repo/profile/airootfs/usr/share/applications/synaqua.desktop" "$payload/usr/share/applications/synaqua.desktop"
+install -Dm644 "$repo/profile/airootfs/usr/lib/systemd/user/synaqua-shell.service" "$payload/usr/lib/systemd/user/synaqua-shell.service"
+install -Dm644 "$repo/profile/airootfs/etc/systemd/user/plasma-plasmashell.service.d/10-synaqua.conf" "$payload/etc/systemd/user/plasma-plasmashell.service.d/10-synaqua.conf"
+mkdir -p "$payload/usr/share/plasma/shells"
+cp -a "$shell" "$payload/usr/share/plasma/shells/"
 cp "$repo/profile/packages.txt" "$dest/airootfs/usr/share/synterra/install-packages.txt"
 grep -Ev '^\s*(#|$)' "$repo/profile/packages.txt" >> "$dest/packages.x86_64"
 sort -u "$dest/packages.x86_64" -o "$dest/packages.x86_64"
@@ -72,7 +97,10 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="1.1.1130"
+iso_version="1.1.1165"
+# Zstandard keeps live-image decompression fast and bounds build CPU usage.
+airootfs_image_type="squashfs"
+airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M' '-processors' '4')
 file_permissions+=(
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
@@ -81,6 +109,19 @@ file_permissions+=(
   ["/usr/local/bin/synterra-surf"]="0:0:755"
   ["/usr/local/bin/synterra-hub"]="0:0:755"
   ["/usr/local/bin/synterra-appearance"]="0:0:755"
+  ["/usr/local/bin/synaqua-shell"]="0:0:755"
+  ["/usr/local/bin/start-synaqua"]="0:0:755"
+  ["/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
+  ["/usr/local/libexec/synaqua-autostart"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/synaqua-shell"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/start-synaqua"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synaqua-autostart"]="0:0:755"
+  ["/etc/skel/Desktop/synterra-home.desktop"]="0:0:755"
+  ["/etc/skel/Desktop/synterra-install.desktop"]="0:0:755"
+  ["/etc/skel/Desktop/synterra-surf.desktop"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/etc/skel/Desktop/synterra-home.desktop"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/etc/skel/Desktop/synterra-surf.desktop"]="0:0:755"
   ["/usr/lib/qt6/plugins/styles/libSynterraGlass.so"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-appearance"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/lib/qt6/plugins/styles/libSynterraGlass.so"]="0:0:755"

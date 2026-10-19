@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Synaqua shell
+Exec=/usr/local/libexec/synaqua-autostart
+OnlyShowIn=KDE;Synaqua;
+NoDisplay=true
+X-KDE-autostart-phase=2

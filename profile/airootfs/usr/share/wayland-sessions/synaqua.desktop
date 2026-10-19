@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Synaqua (Preview)
+Comment=Synterra's glass desktop shell, using KWin and Plasma session services
+Exec=/usr/local/bin/start-synaqua
+TryExec=/usr/local/bin/synaqua-shell
+DesktopNames=Synaqua;KDE;
+Type=Application

@@ -1,32 +1,38 @@
-# Build status — 2026-10-09
+# Build status — 2026-10-19
 
-Synterra 1.1 Build 1130 (Prism) built successfully with official Archiso in SynterraBuild.
+Synterra 1.1 Build 1165 (Prism) was built with official Archiso in SynterraBuild WSL. It introduces Synaqua 0.1, an experimental desktop-shell preview.
 
-- Image: synterra-1.1.1130-x86_64.iso.
-- Size: 2,412,625,920 bytes (about 2.25 GiB).
-- SHA-256: 0f6a9e4e5a994fd4a33c984b9223b45e51816f2c4276b73c76b210d8aaadb950.
-- Release: v1.1.1130, distributed in two ISO parts with whole-image and part checksums, a Surf 1.1.1 update archive/checksum and screenshots.
+- Image: `synterra-1.1.1165-x86_64.iso`
+- Size: 2,596,274,176 bytes (about 2.42 GiB)
+- SHA-256: `ac025a37c68dcb0ada245595dfbf77b828f38ff53c7a57d7f11f5356e4dfb3b2`
+- Release: [v1.1.1165](https://github.com/realphoni/synterra/releases/tag/v1.1.1165), with two ISO parts and whole-image/part checksums.
 
 ## Changes
 
-This is a browser-focused release. Surf 1.1.1 adds loading progress, Stop/Reload, per-tab muting, a recoverable failed-load/web-process-crash notice and per-tab Chromium developer tools. Page updates preserve address-bar edits; selecting another tab updates its address. Ctrl+Shift+R reloads while bypassing HTTP cache.
+Synaqua adds an original native C++/Qt Quick floating glass dock, centered Start button, persistent application pins on both sides, searchable application catalog and running-window controls. Home, Glass switching, Lock, Power, settings shortcuts, a clock and Show Desktop are included. The live image opens directly on the desktop; Hub remains pinned and can be opted into at login.
 
-User-triggered JavaScript windows open using the original request without racing a Home load. Opener relationships are retained, script-opened tabs can close themselves, and background links leave the current tab selected. Automatic popups stay blocked and display a status message. Developer tools share their window's profile, including the isolated private profile, and are destroyed before the inspected tab/profile.
+KWin provides Wayland compositing/window management. Plasma supplies desktop views, session startup, locking and logout. Synaqua has a separate desktop-services package and layout, while Plasma (Wayland) remains available as a fallback. This is not an independent compositor or a complete KDE replacement. See the [Synaqua guide](SYNAQUA.md) for controls and current limits.
 
-Light/Dark Glass, Synterra's widget/icon/login themes, Hub, installer recovery, GRUB artwork and the supplied wallpapers remain included. OS, installer, browser, desktop, login and boot branding identify Build 1130. This release does not redesign the desktop or change installation behavior.
+The shell defaults to a local software scene graph for basic virtual graphics without changing launched applications' renderer environment. The image uses Zstandard filesystem compression. Light/Dark Glass, original Aurora/Graphite wallpapers, GRUB artwork, Surf 1.1.1 and Hub remain included with Build 1165 branding.
+
+Installer account checks now cover the upper regular-user UID boundary, normalized home paths and symlinked home ancestors. A mounted existing installation is directed to guarded recovery instead of repartitioning. Finalization selects the installed Synaqua session and retains the created account's authentication. Live-user autologin and passwordless sudo are not copied.
 
 ## Validation
 
-Rust source validation and installer target/greeter regressions passed. The final Surf and Hub binaries and Glass style plugin compiled. Surf's URL, port/path, scheme rejection, history cap/deduplication, credential stripping and session/private self-tests passed.
+Rust source validation and installer regressions passed, including UID/home-path cases and display-manager recovery. Surf, Hub, Glass and Synaqua compiled against current Arch packages. Hub's live/installed action guards and Synaqua welcome behavior passed.
 
-The final browser ran as an unprivileged user with Chromium sandboxing enabled, isolated test configuration and a virtual X11 display. Both normal and private runs passed real rendering, find results, tab closure, an HTTP download fixture, fullscreen/Escape, zoom, bookmark search/removal and PDF export. The new HTTP/JavaScript fixture passed async/await, fetch/JSON, DOM and local-storage checks, automatic popup blocking, actual mouse-triggered popup opening, opener/close callbacks and Ctrl-click background tabs. Tab muting stayed isolated; address editing and new-tab address replacement passed. F12 attached the inspector to the correct page/profile, closing it detached it, and closing its tab removed its inspector. Stop did not produce an error; a failed HTTP load and an actual killed renderer recovered on reload.
+Native Synaqua UI tests passed in Light and Dark modes using its default renderer: application search and empty results, Enter activation, menu visibility, Escape/outside dismissal, centered Start at 1024 pixels, bounded persistent pins and invalid desktop IDs. A real KIO desktop-file launch preserved a quoted argument containing spaces. These checks used isolated test settings and an unprivileged account.
 
-The finished ISO was mounted read-only. Both firmware boot files and GRUB syntax passed. Live and installed payloads contain Build 1130 branding and the exact tested Surf binary. Executable helpers/plugins, Glass defaults, both themes, login QML and original wallpaper hashes passed inspection. BIOS Syslinux and UEFI GRUB menus rendered from this ISO and were visually inspected. The download parts were streamed together and verified against the whole-image SHA-256 without creating a duplicate ISO.
+The final shell also ran inside a real isolated KWin Wayland session with Plasma desktop services. Its dock, Start menu and D-Bus activation rendered successfully. Native preview screenshots are labeled separately from live-ISO captures.
 
-An isolated QEMU UEFI VM with 3 GiB RAM, no network and no hard disk reached the Plasma desktop, Aurora wallpaper, bottom taskbar and Synterra Hub. Surf launched from the final ISO and rendered its actual homepage with Build 1130 branding and Glass controls. Its initial load was slow under software emulation. Live screenshots were visually inspected; browser behavior regressions above ran natively on the build host.
+The finished ISO's SHA-256 was independently checked on Windows. Read-only ISO inspection and userspace filesystem extraction verified Build 1165 branding, executable helpers, both session payloads and the exact tested Synaqua binary. The installed payload retains Home/Surf shortcuts and excludes the live installer shortcut.
+
+The final ISO booted through UEFI in an isolated QEMU VM with no network or hard disk and reached Synaqua without renderer/debug overrides. The actual desktop, supplied wallpaper, three desktop shortcuts, dock and Start menu were visually inspected. Konsole launched from Start and appeared in the running-window strip. Software emulation is slow; native UI tests provide the more detailed interaction checks.
 
 ## Remaining validation
 
-A complete installation to a disposable VM disk, installed login authentication, encrypted installations, BIOS desktop startup, wider hardware compatibility, physical Bluetooth/KDE Connect pairing and broad website/download-cancellation behavior still need testing. JavaScript tests use local fixtures; they do not establish compatibility with every sign-in provider or website. Release signing is future work.
+A complete installation to a disposable VM disk, installed login authentication, encrypted installations, BIOS desktop startup, VMware 3D acceleration, multiple displays/hot-plugging, accessibility and broad hardware testing remain outstanding. The dock currently targets the primary display and does not implement a complete tray or notification center. Physical Bluetooth/KDE Connect pairing and broad website compatibility remain untested. Release signing is future work.
 
 At Archinstall completion choose Exit and wait for Synterra finalization before rebooting. If a guard fails, keep the live session running and inspect the reported condition.
+
+Previous browser-focused validation is archived in [Build 1130 status](BUILD-STATUS-1130.md).

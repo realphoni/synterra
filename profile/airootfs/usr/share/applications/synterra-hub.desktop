@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Synterra Hub
-Comment=Set up and explore Synterra 1.1 Build 1130
+Comment=Set up and explore Synterra 1.1 Build 1165
 Exec=synterra-hub
 Icon=synterra
 Categories=Settings;System;

@@ -1,0 +1,15 @@
+[Unit]
+Description=Synaqua desktop dock and Start menu
+After=plasma-plasmashell.service
+PartOf=graphical-session.target
+ConditionEnvironment=XDG_SESSION_DESKTOP=synaqua
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=dbus
+BusName=org.synterra.Synaqua
+ExecStart=/usr/local/bin/synaqua-shell
+Restart=on-failure
+RestartSec=2
+Slice=session.slice

@@ -9,7 +9,7 @@ destination=${2:-/mnt/e/tuff/out}
 repo=/root/synterra
 mkdir -p "$repo" "$destination"
 # Build on the Linux filesystem; do not put archiso working files on DrvFS.
-for item in scripts src browser desktop Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
+for item in scripts src browser desktop synaqua Cargo.toml Cargo.lock profile assets README.md LICENSE .gitattributes; do
     cp -a "$source_dir/$item" "$repo/"
 done
 # Remove the obsolete pre-install branding overlay from earlier source copies.
@@ -18,7 +18,7 @@ rm -f "$repo/profile/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
     "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg grub librsvg ttf-dejavu
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg qt6-declarative qt6-wayland layer-shell-qt kservice kio kglobalaccel kwindowsystem kirigami plasma-workspace plasma-desktop grub librsvg ttf-dejavu
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh

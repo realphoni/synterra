@@ -74,7 +74,7 @@ class Hub final : public QWidget {
     }
 protected:
     void closeEvent(QCloseEvent *event) override {
-        settings.setValue("seenVersion", "1.1.1130");
+        settings.setValue("seenVersion", "1.1.1165");
         settings.setValue("showOnLogin", startup->isChecked());
         QWidget::closeEvent(event);
     }
@@ -85,7 +85,7 @@ public:
         auto layout = new QVBoxLayout(this); layout->setContentsMargins(22, 22, 22, 18); layout->setSpacing(16);
         auto hero = new QWidget(this); hero->setObjectName("hero"); auto heroRow = new QHBoxLayout(hero);
         auto orb = new QLabel(hero); orb->setPixmap(QIcon(":/hub/synterra.svg").pixmap(72, 72)); heroRow->addWidget(orb);
-        auto heading = new QLabel("<h1>Synterra 1.1</h1><p>Build 1130 · Prism · Your desktop, brought together.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
+        auto heading = new QLabel("<h1>Synterra 1.1</h1><p>Build 1165 · Prism · Meet Synaqua.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
         auto tabs = new QTabWidget(this); layout->addWidget(tabs, 1);
         auto setup = new QWidget(tabs); auto setupLayout = new QVBoxLayout(setup);
         auto mode = new QLabel(live ? "Explore the live desktop, or install Synterra on your own disk." : "Welcome home. Set up your desktop and keep it up to date.", setup);
@@ -120,10 +120,13 @@ public:
         card(appGrid, 5, "Media player", "Music and video", "vlc", "vlc");
         appLayout->addStretch(); tabs->addTab(apps, "Applications");
         auto about = new QWidget(tabs); auto aboutLayout = new QVBoxLayout(about);
-        auto system = new QLabel("Synterra 1.1 Build 1130\nPrism · Arch-based · KDE Plasma\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
+        const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.1 preview" : "KDE Plasma";
+        auto system = new QLabel("Synterra 1.1 Build 1165\nPrism · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
         system->setTextFormat(Qt::PlainText); system->setTextInteractionFlags(Qt::TextSelectableByMouse); aboutLayout->addWidget(system);
         auto help = new QPushButton("Synterra documentation", about); aboutLayout->addWidget(help);
         connect(help, &QPushButton::clicked, this, [this] { launch("synterra-surf", {"https://github.com/realphoni/synterra#readme"}); });
+        auto synaquaHelp = new QPushButton("Synaqua desktop guide", about); aboutLayout->addWidget(synaquaHelp);
+        connect(synaquaHelp, &QPushButton::clicked, this, [this] { launch("synterra-surf", {"https://github.com/realphoni/synterra/blob/main/docs/SYNAQUA.md"}); });
         auto arch = new QPushButton("Arch Wiki", about); aboutLayout->addWidget(arch);
         connect(arch, &QPushButton::clicked, this, [this] { launch("synterra-surf", {"https://wiki.archlinux.org/"}); });
         aboutLayout->addStretch(); tabs->addTab(about, "About && help");
@@ -137,7 +140,8 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv); app.setOrganizationName("Synterra"); app.setApplicationName("SynterraHub"); app.setApplicationDisplayName("Synterra Hub");
     GlassAppearance::syncPalette();
     QSettings settings;
-    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "1.1.1130" && !settings.value("showOnLogin", false).toBool()) return 0;
+    if (app.arguments().contains("--welcome") && qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" && !settings.value("showOnLogin", false).toBool()) return 0;
+    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "1.1.1165" && !settings.value("showOnLogin", false).toBool()) return 0;
     Hub window(QDir("/run/archiso").exists()); window.show();
     if (app.arguments().contains("--smoke-test")) {
         QTimer::singleShot(250, &app, [&app, &window] {

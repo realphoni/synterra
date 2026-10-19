@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Synterra Surf
+Exec=synterra-surf
+Icon=synterra-surf
+Terminal=false

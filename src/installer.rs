@@ -34,8 +34,8 @@ fn user_names(passwd: &str) -> Vec<String> {
                     .bytes()
                     .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-');
             (valid
-                && (1000..60000).contains(&uid)
-                && parts[5] == format!("/home/{name}")
+                && (1000..=60000).contains(&uid)
+                && parts[5].trim_end_matches('/') == format!("/home/{name}")
                 && name != "live")
                 .then(|| name.to_string())
         })
@@ -59,9 +59,12 @@ fn validate_target(target: &Path) -> Result<Vec<String>> {
     let users = user_names(&fs::read_to_string(target.join("etc/passwd"))?);
     if users.is_empty() {
         return Err(
-            "Create a regular administrator account in Archinstall before finalizing Synterra."
+            "No regular account was found in the installed /etc/passwd. Keep the live session open and run sudo /usr/local/libexec/synterra-recover to inspect or create the account and finish setup. Do not run the partitioner again."
                 .into(),
         );
+    }
+    if fs::symlink_metadata(target.join("home"))?.file_type().is_symlink() {
+        return Err("Refusing a symlinked installed /home directory.".into());
     }
     for user in &users {
         let home = target.join("home").join(user);
@@ -88,12 +91,13 @@ pub fn install() -> Result {
         .status()?
         .success()
     {
-        return Err("The installer target is already mounted. Finish or unmount the earlier installation before retrying.".into());
+        println!("An installation is already mounted. Opening recovery to finish it without rerunning the partitioner.");
+        return command("bash", &["/usr/local/libexec/synterra-recover"]);
     }
     if !Path::new(PAYLOAD).join("etc/skel").is_dir() {
         return Err("Installer desktop payload is missing.".into());
     }
-    println!("\nSynterra 1.1 Build 1130 installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
+    println!("\nSynterra 1.1 Build 1165 installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
     let mut answer = String::new();
     io::stdin().read_line(&mut answer)?;
     if !answer.trim().is_empty() {
@@ -172,6 +176,9 @@ pub fn install() -> Result {
         target.join("etc/sddm.conf.d/10-synterra.conf"),
         "[Theme]\nCurrent=SynterraGlass\n",
     )?;
+    fs::create_dir_all(target.join("var/lib/sddm"))?;
+    command("arch-chroot", &[TARGET, "kwriteconfig6", "--file", "/var/lib/sddm/state.conf", "--group", "Last", "--key", "Session", "/usr/share/wayland-sessions/synaqua.desktop"])?;
+    command("arch-chroot", &[TARGET, "chown", "sddm:sddm", "/var/lib/sddm/state.conf"])?;
     command(
         "systemctl",
         &[
@@ -208,6 +215,7 @@ pub fn install() -> Result {
 
 pub fn test() -> Result {
     assert_eq!(user_names("root:x:0:0::/root:/bin/bash\nlive:x:1000:1000::/home/live:/bin/bash\nphoni:x:1001:1001::/home/phoni:/bin/bash\nbad:x:1002:1002::/../../etc:/bin/bash\nnobody:x:65534:65534::/:/bin/false"), vec!["phoni"]);
+    assert_eq!(user_names("phoni:x:1000:1000::/home/phoni/:/bin/bash\nlast:x:60000:60000::/home/last:/bin/bash"), vec!["phoni", "last"]);
     let temp = std::env::temp_dir().join(format!("synterra-installer-test-{}", std::process::id()));
     fs::create_dir_all(temp.join("etc"))?;
     fs::create_dir_all(temp.join("usr/bin"))?;
@@ -246,6 +254,11 @@ pub fn test() -> Result {
             );
             fs::remove_file(temp.join("home/phoni"))?;
             fs::create_dir(temp.join("home/phoni"))?;
+            fs::rename(temp.join("home"), temp.join("saved-home"))?;
+            std::os::unix::fs::symlink(temp.join("saved-home"), temp.join("home"))?;
+            assert!(validate_target(&temp).is_err(), "A symlinked /home ancestor must be rejected");
+            fs::remove_file(temp.join("home"))?;
+            fs::rename(temp.join("saved-home"), temp.join("home"))?;
         }
         let units = temp.join("usr/lib/systemd/system");
         fs::create_dir_all(&units)?;

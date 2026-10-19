@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "Plasma/Shell",
+  "KPlugin": {
+    "Id": "org.synterra.synaqua",
+    "Name": "Synaqua desktop services",
+    "Description": "KDE desktop views used by the Synaqua preview",
+    "License": "GPL-2.0-or-later",
+    "Authors": [{"Name": "KDE contributors"}, {"Name": "Synterra"}]
+  },
+  "X-KDE-ParentApp": "org.kde.plasmashell",
+  "X-Plasma-APIVersion": "2"
+}

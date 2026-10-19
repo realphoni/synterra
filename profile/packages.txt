@@ -1,5 +1,13 @@
 plasma-desktop
 plasma-workspace
+qt6-declarative
+qt6-wayland
+layer-shell-qt
+kservice
+kio
+kglobalaccel
+kwindowsystem
+kirigami
 plasma-nm
 plasma-pa
 plasma-systemmonitor

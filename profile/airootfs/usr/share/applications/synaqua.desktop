@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Synaqua
+Comment=Open the Synaqua Start menu
+Exec=synaqua-shell
+Icon=synterra
+Categories=System;
+NoDisplay=true

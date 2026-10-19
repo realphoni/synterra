@@ -153,6 +153,13 @@ pub fn validate(repo: &Path) -> Result {
     require(unique.len() == packages.len(), "Duplicate packages")?;
     for package in [
         "plasma-desktop",
+        "layer-shell-qt",
+        "qt6-wayland",
+        "kirigami",
+        "kservice",
+        "kio",
+        "kglobalaccel",
+        "kwindowsystem",
         "sddm",
         "open-vm-tools",
         "aurorae",
@@ -181,6 +188,19 @@ pub fn validate(repo: &Path) -> Result {
         !unique.contains("firefox"),
         "Firefox must be replaced by Synterra Surf",
     )?;
+    for path in [
+        "usr/local/bin/start-synaqua",
+        "usr/local/libexec/synterra-plasma-shell",
+        "usr/local/libexec/synaqua-autostart",
+        "usr/share/wayland-sessions/synaqua.desktop",
+        "usr/lib/systemd/user/synaqua-shell.service",
+        "etc/systemd/user/plasma-plasmashell.service.d/10-synaqua.conf",
+    ] {
+        require(root.join(path).is_file(), format!("Synaqua session component missing: {path}"))?;
+    }
+    let session = fs::read_to_string(root.join("etc/sddm.conf.d/10-synterra.conf"))?;
+    require(session.contains("Session=synaqua.desktop"), "Live session must select Synaqua")?;
+    require(repo.join("synaqua/desktop-layout.js").is_file(), "Separate Synaqua layout missing")?;
     require(
         !root
             .join("etc/skel/.config/fastfetch/config.jsonc")
