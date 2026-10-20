@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     test |= layerTest;
     const bool windowed = preview || (test && !layerTest);
     QApplication app(argc, argv);
-    // The preview uses simple 2D items. A raster scene graph also works on
+    // The dock uses simple 2D items. A raster scene graph also works on
     // basic virtual GPUs without inheriting a renderer override into apps.
     if (qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND")) QQuickWindow::setSceneGraphBackend("software");
     app.setOrganizationName("Synterra"); app.setApplicationName(test ? "SynaquaTest" : "Synaqua");

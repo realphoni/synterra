@@ -3,7 +3,7 @@
   "KPlugin": {
     "Id": "org.synterra.synaqua",
     "Name": "Synaqua desktop services",
-    "Description": "KDE desktop views used by the Synaqua preview",
+    "Description": "KDE desktop views used by the Synaqua desktop",
     "License": "GPL-2.0-or-later",
     "Authors": [{"Name": "KDE contributors"}, {"Name": "Synterra"}]
   },

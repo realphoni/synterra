@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Synaqua (Preview)
+Name=Synaqua
 Comment=Synterra's glass desktop shell, using KWin and Plasma session services
 Exec=/usr/local/bin/start-synaqua
 TryExec=/usr/local/bin/synaqua-shell

@@ -1,11 +1,11 @@
 # Build status — 2026-10-20
 
-Synterra 1.1 Build 1170 (Prism) introduces Synaqua 0.2 dock settings. The image retains Build 1165's verified Arch package/kernel base and replaces Synterra's native applications, settings plugin, desktop assets and branding. A normal full Archiso build remains available through the repository's build scripts.
+Synterra 1.1 (Prism), Build 1170, is the full 1.1 release. It includes Synaqua 0.2 and dock settings, with release-preview labels removed from the login session, desktop and Hub. The image retains Build 1165's verified Arch package/kernel base and replaces Synterra's native applications, settings plugin, desktop assets and branding. A normal full Archiso build remains available through the repository's build scripts.
 
-- Image: `synterra-1.1.1170-x86_64.iso`
+- Image: `synterra-1.1.0-x86_64.iso`
 - Size: 2,595,487,744 bytes
-- SHA-256: `a5880a1528629446204475dbdf8412d3d669d65358c696e2d546d4e3c78a5002`
-- Release: [v1.1.1170](https://github.com/realphoni/synterra/releases/tag/v1.1.1170), split into two ISO parts with whole-image and part checksums.
+- SHA-256: `5db720a1be1ba080b609aa2a07f99b5a8f030c58737c32b6bae62d7cb3c2c19d`
+- Release: [v1.1.0](https://github.com/realphoni/synterra/releases/tag/v1.1.0), split into two ISO parts with whole-image and part checksums.
 
 ## Changes
 
@@ -29,4 +29,4 @@ Read-only ISO inspection verified the filesystem checksum, Build 1170 metadata a
 
 A complete installation and installed login authentication, encrypted installations, BIOS desktop startup, VMware 3D acceleration, multiple monitors/hot-plugging, accessibility and wider hardware testing remain outstanding. The dock is primary-display only and still has no complete tray or notification center. See the [Synaqua guide](SYNAQUA.md).
 
-Previous build validation is archived in [Build 1165 status](BUILD-STATUS-1165.md).
+Previous build validation is archived in [Build 1170 status](BUILD-STATUS-1170.md).

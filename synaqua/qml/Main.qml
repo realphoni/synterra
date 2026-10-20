@@ -111,7 +111,7 @@ FocusScope {
                 ToolButton { text: "Lock"; palette.buttonText: root.ink; onClicked: { root.closeMenu(); synaqua.lockScreen() } }
                 ToolButton { text: "Power"; palette.buttonText: root.ink; onClicked: { root.closeMenu(); synaqua.openSessionDialog() } }
             }
-            Label { text: "Synterra 1.1 · Build 1170 · Synaqua 0.2 preview"; color: root.subtle; font.pixelSize: 10; Layout.alignment: Qt.AlignHCenter }
+            Label { text: "Synterra 1.1 · Build 1170 · Synaqua 0.2"; color: root.subtle; font.pixelSize: 10; Layout.alignment: Qt.AlignHCenter }
         }
     }
     GlassPane {

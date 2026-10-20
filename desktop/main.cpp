@@ -121,7 +121,7 @@ public:
         card(appGrid, 5, "Media player", "Music and video", "vlc", "vlc");
         appLayout->addStretch(); tabs->addTab(apps, "Applications");
         auto about = new QWidget(tabs); auto aboutLayout = new QVBoxLayout(about);
-        const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.2 preview" : "KDE Plasma";
+        const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.2" : "KDE Plasma";
         auto system = new QLabel("Synterra 1.1 Build 1170\nPrism · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
         system->setTextFormat(Qt::PlainText); system->setTextInteractionFlags(Qt::TextSelectableByMouse); aboutLayout->addWidget(system);
         auto help = new QPushButton("Synterra documentation", about); aboutLayout->addWidget(help);

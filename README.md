@@ -1,36 +1,36 @@
 # Synterra
 
-An Arch-based x86_64 live distribution with Synaqua, our new Aero-inspired desktop-shell preview using KWin/Plasma services.
+An Arch-based x86_64 live distribution with Synaqua, the Aero-inspired Synaqua desktop using KWin/Plasma services.
 
-Current release: **Synterra 1.1 Build 1170 (Prism)** with the **Synaqua 0.2 desktop-shell preview and configurable dock**. [Synaqua guide](docs/SYNAQUA.md).
+Current full release: **Synterra 1.1 (Prism)**, Build 1170, with **Synaqua 0.2 and its configurable dock**. [Synaqua guide](docs/SYNAQUA.md).
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1170 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1170). The image is 2,595,487,744 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 release](https://github.com/realphoni/synterra/releases/tag/v1.1.0). The image is 2,595,487,744 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-1.1.1170-x86_64.iso.part00 synterra-1.1.1170-x86_64.iso.part01 > synterra-1.1.1170-x86_64.iso
+cat synterra-1.1.0-x86_64.iso.part00 synterra-1.1.0-x86_64.iso.part01 > synterra-1.1.0-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-1.1.1170-x86_64.iso.part00+synterra-1.1.1170-x86_64.iso.part01 synterra-1.1.1170-x86_64.iso
+copy /b synterra-1.1.0-x86_64.iso.part00+synterra-1.1.0-x86_64.iso.part01 synterra-1.1.0-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-1.1.1170-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.1.0-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `a5880a1528629446204475dbdf8412d3d669d65358c696e2d546d4e3c78a5002`.
+Expected SHA-256: `5db720a1be1ba080b609aa2a07f99b5a8f030c58737c32b6bae62d7cb3c2c19d`.
 
-Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
+Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. See the build validation notes for tested configurations and remaining hardware checks.
 
 ## New in Synterra 1.1 Build 1170
 
@@ -47,10 +47,10 @@ See the [dock settings guide](docs/SYNAQUA.md#dock-settings). `synaqua-shell --s
 - **Synaqua 0.1 preview** begins our own desktop shell: a floating glass dock, centered Start button and pinned applications on both sides, based on the supplied sketch.
 - **Searchable Start menu** lists installed apps, supports keyboard navigation and launches standard desktop entries through KIO. Stars add or remove up to eight persistent dock pins.
 - **Running-window controls**, Home and Surf desktop shortcuts, a clock, matching settings shortcuts, Show Desktop, Glass switching, screen locking and session controls make the first shell usable.
-- **Separate session and layout** provide Synaqua (Preview) at sign-in while preserving the normal Plasma session and its panel layout. This first version uses KWin/Plasma session and desktop services; it does not yet replace the entire KDE stack.
+- **Separate session and layout** provide Synaqua at sign-in while preserving the normal Plasma session and its panel layout. This first version uses KWin/Plasma session and desktop services; it does not yet replace the entire KDE stack.
 - **Installer continuation** opens guarded recovery when its existing installation target is mounted, improving the path for finishing a partial install without running the partitioner again. Account checks accept a trailing home-directory slash and the default UID upper boundary, and reject a symlinked `/home` ancestor.
 
-See [Synaqua's controls and current limits](docs/SYNAQUA.md) and [build validation](docs/BUILD-STATUS.md). This is an early Synaqua preview; its current limits and actual validation are documented below.
+See [Synaqua's controls and current limits](docs/SYNAQUA.md) and [build validation](docs/BUILD-STATUS.md). Current capabilities and validation are documented below.
 
 ## Included from Synterra 1.1 Build 1130
 
@@ -198,7 +198,7 @@ sudo bash scripts/build-arch.sh
 
 Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D acceleration enabled). Keep Manjaro as the builder. Verify:
 
-1. The live session enters Synaqua (Preview) automatically as `live`.
+1. The live session enters Synaqua automatically as `live`.
 2. Aurora and the desktop shortcuts are visible, the floating dock has a centered Start button, and glass frames have working minimize/maximize/close buttons.
 3. Test Start search, pinning, running-window controls, network/sound settings, resize, clipboard and the wallpaper picker.
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
@@ -215,7 +215,7 @@ Choose the target disk, partition layout, timezone, bootloader and a regular adm
 
 **At Archinstall's completion screen choose Exit, not Reboot.** The wrapper then copies Synterra's desktop and GRUB themes, wallpapers and user defaults, applies branding and enables the desktop services. Wait for **Synterra installation finished**, then shut down, eject the live ISO and boot from the installed disk.
 
-Installed systems select Synaqua (Preview) by default, with Plasma (Wayland) available in the sign-in session selector. They use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. This installer is experimental; a full installation on a disposable VM disk still needs validation.
+Installed systems select Synaqua by default, with Plasma (Wayland) available in the sign-in session selector. They use the account you created. Live-session autologin, the live account and passwordless sudo are not copied. The installer rejects cancelled or incomplete base installations and targets without a regular account. See the build validation notes for installation coverage.
 
 ## GRUB splash
 

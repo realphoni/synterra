@@ -99,7 +99,7 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="1.1.1170"
+iso_version="1.1.0"
 # Zstandard keeps live-image decompression fast and bounds build CPU usage.
 airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M' '-processors' '4')
