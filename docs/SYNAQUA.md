@@ -1,8 +1,8 @@
-# Synaqua 0.1 preview
+# Synaqua 0.2 preview
 
 Synaqua is Synterra's new desktop shell, first included in Synterra 1.1 Build 1165 (Prism). Its floating glass dock, centered Start button and pinned apps follow the supplied desktop sketch. The two original Prism wallpapers remain unchanged.
 
-This first version provides an original C++/Qt Quick dock and application launcher. KWin provides Wayland compositing and window management; Plasma supplies the session, desktop folder view, screen locking and logout dialog. These upstream components keep their own licenses. Synaqua is an early desktop-shell preview, and does not yet replace the entire KDE stack.
+The current version provides an original C++/Qt Quick dock and application launcher. KWin provides Wayland compositing and window management; Plasma supplies the session, desktop folder view, screen locking and logout dialog. These upstream components keep their own licenses. Synaqua is an early desktop-shell preview, and does not yet replace the entire KDE stack.
 
 ## Use it
 
@@ -17,6 +17,21 @@ The live image starts **Synaqua (Preview)** directly on the desktop. Open Synter
 
 Synaqua's desktop layout uses `plasma-org.synterra.synaqua-appletsrc`, independently of the normal Plasma layout. Changing Glass mode retains the layout and wallpaper.
 
+## Dock settings
+
+Open **System Settings → Appearance & Style → Synaqua Dock**, choose **Dock settings** in Start, right-click an empty part of the dock, or open its card in Synterra Hub. Apply changes without signing out.
+
+- **Dock size:** 60–125%; shrinks or enlarges the dock, icons and controls together.
+- **Dock width:** 45–100% of the available screen width; a small side margin keeps the dock floating.
+- **Icon spacing:** 0–16 pixels, scaled with dock size.
+- **Distance from screen edge:** 0–48 pixels.
+- **Visibility:** clock/date, Synaqua branding and running-window controls.
+- **Presets:** Compact, Balanced and Wide. Restore Defaults returns to Balanced after Apply.
+
+Start stays centered. Narrow layouts automatically expand enough to fit pinned apps and controls; on smaller displays oversized choices scale down to fit. The space reserved for maximized windows follows the dock's actual height and edge distance. Existing pins, wallpaper and Glass mode are retained.
+
+Settings are saved per user in `~/.config/Synterra/Synaqua.conf`. `synaqua-shell --settings` opens the same controls as a standalone dialog. Editing controls leaves the current dock unchanged until Apply; closing discards unapplied edits. Settings can be configured from Plasma, then take effect when Synaqua starts.
+
 ## Current limits
 
 The dock lives on the primary display. Desktop views on other displays are provided by Plasma. The preview does not yet implement a complete status-notifier tray, notification center, dock drag-and-drop, per-screen docks or its own settings/control-center application. Network and clock buttons are settings shortcuts, not live status indicators. Start targets screens of at least 1024×768; accessibility, display hot-plugging and unusual scaling need broader testing.
@@ -29,7 +44,7 @@ Source lives in `synaqua/`. Its native application catalog uses KService and KIO
 
 The preview defaults to Qt Quick's software scene graph so the dock also renders on basic virtual graphics. This is local to the shell process; launched applications retain their own renderer choice. KWin still supplies compositor effects. An explicit `QT_QUICK_BACKEND` overrides the default for development.
 
-Build on Arch with Qt 6 Quick/QML/Widgets/DBus, KService, KIO, KGlobalAccel, KWindowSystem, Kirigami and LayerShellQt installed:
+Build on Arch with Qt 6 Quick/QML/Widgets/DBus, KService, KIO, KGlobalAccel, KWindowSystem, KCMUtils, KCoreAddons, Kirigami and LayerShellQt installed:
 
 ```bash
 cmake -S synaqua -B target/synaqua -G Ninja -DCMAKE_BUILD_TYPE=Release

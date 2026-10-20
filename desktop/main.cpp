@@ -74,7 +74,7 @@ class Hub final : public QWidget {
     }
 protected:
     void closeEvent(QCloseEvent *event) override {
-        settings.setValue("seenVersion", "1.1.1165");
+        settings.setValue("seenVersion", "1.1.1170");
         settings.setValue("showOnLogin", startup->isChecked());
         QWidget::closeEvent(event);
     }
@@ -85,7 +85,7 @@ public:
         auto layout = new QVBoxLayout(this); layout->setContentsMargins(22, 22, 22, 18); layout->setSpacing(16);
         auto hero = new QWidget(this); hero->setObjectName("hero"); auto heroRow = new QHBoxLayout(hero);
         auto orb = new QLabel(hero); orb->setPixmap(QIcon(":/hub/synterra.svg").pixmap(72, 72)); heroRow->addWidget(orb);
-        auto heading = new QLabel("<h1>Synterra 1.1</h1><p>Build 1165 · Prism · Meet Synaqua.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
+        auto heading = new QLabel("<h1>Synterra 1.1</h1><p>Build 1170 · Prism · Meet Synaqua.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
         auto tabs = new QTabWidget(this); layout->addWidget(tabs, 1);
         auto setup = new QWidget(tabs); auto setupLayout = new QVBoxLayout(setup);
         auto mode = new QLabel(live ? "Explore the live desktop, or install Synterra on your own disk." : "Welcome home. Set up your desktop and keep it up to date.", setup);
@@ -97,8 +97,9 @@ public:
         card(grid, 2, "Network", "Wi-Fi and connections", "network-wireless", "systemsettings", {"kcm_networkmanagement"});
         card(grid, 3, "Bluetooth", "Headphones and devices", "preferences-system-bluetooth", "systemsettings", {"kcm_bluetooth"});
         card(grid, 4, "Phone integration", "Pair with KDE Connect", "smartphone", "kdeconnect-app");
+        card(grid, 5, "Synaqua Dock", "Size, width and spacing", "preferences-desktop-theme", "systemsettings", {"kcm_synaqua_dock"});
         updatesButton = new QPushButton(QIcon::fromTheme("system-software-update"), "System updates\nReview updates in the terminal", this);
-        updatesButton->setMinimumHeight(76); updatesButton->setEnabled(!live); grid->addWidget(updatesButton, 2, 1);
+        updatesButton->setMinimumHeight(76); updatesButton->setEnabled(!live); grid->addWidget(updatesButton, 3, 0, 1, 2);
         connect(updatesButton, &QPushButton::clicked, this, [this] {
             if (live) return;
             if (QMessageBox::question(this, "Update Synterra", "Open the system updater? It will ask for your administrator password and show the package changes before you confirm.", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
@@ -120,8 +121,8 @@ public:
         card(appGrid, 5, "Media player", "Music and video", "vlc", "vlc");
         appLayout->addStretch(); tabs->addTab(apps, "Applications");
         auto about = new QWidget(tabs); auto aboutLayout = new QVBoxLayout(about);
-        const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.1 preview" : "KDE Plasma";
-        auto system = new QLabel("Synterra 1.1 Build 1165\nPrism · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
+        const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.2 preview" : "KDE Plasma";
+        auto system = new QLabel("Synterra 1.1 Build 1170\nPrism · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
         system->setTextFormat(Qt::PlainText); system->setTextInteractionFlags(Qt::TextSelectableByMouse); aboutLayout->addWidget(system);
         auto help = new QPushButton("Synterra documentation", about); aboutLayout->addWidget(help);
         connect(help, &QPushButton::clicked, this, [this] { launch("synterra-surf", {"https://github.com/realphoni/synterra#readme"}); });
@@ -141,7 +142,7 @@ int main(int argc, char **argv) {
     GlassAppearance::syncPalette();
     QSettings settings;
     if (app.arguments().contains("--welcome") && qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" && !settings.value("showOnLogin", false).toBool()) return 0;
-    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "1.1.1165" && !settings.value("showOnLogin", false).toBool()) return 0;
+    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "1.1.1170" && !settings.value("showOnLogin", false).toBool()) return 0;
     Hub window(QDir("/run/archiso").exists()); window.show();
     if (app.arguments().contains("--smoke-test")) {
         QTimer::singleShot(250, &app, [&app, &window] {

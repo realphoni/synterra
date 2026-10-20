@@ -18,7 +18,7 @@ rm -f "$repo/profile/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
     "$repo/profile/airootfs/usr/share/synterra/fastfetch-logo.txt"
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg qt6-declarative qt6-wayland layer-shell-qt kservice kio kglobalaccel kwindowsystem kirigami plasma-workspace plasma-desktop grub librsvg ttf-dejavu
+pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg qt6-declarative qt6-wayland layer-shell-qt kservice kio kglobalaccel kwindowsystem kcmutils kcoreaddons kirigami plasma-workspace plasma-desktop grub librsvg ttf-dejavu
 cd "$repo"
 cargo run --locked -- validate
 bash scripts/build-arch.sh

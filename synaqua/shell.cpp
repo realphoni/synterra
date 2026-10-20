@@ -7,10 +7,12 @@
 #include <QDir>
 #include <QFile>
 #include <QFileSystemWatcher>
+#include <QFileInfo>
 #include <QPainterPath>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QtMath>
 #include <KIO/ApplicationLauncherJob>
 #include <KIO/OpenUrlJob>
 #include <KJob>
@@ -28,19 +30,28 @@ QRegion rounded(const QRectF &rect) {
 }
 
 Synaqua::Synaqua(bool preview, QObject *parent) : QObject(parent), m_preview(preview) {
+    m_dock = DockPreferences::read(m_settings);
     reload();
     const QStringList defaults = {"org.kde.dolphin.desktop", "synterra-surf.desktop", "org.kde.konsole.desktop",
         "synterra-hub.desktop", "systemsettings.desktop", "org.kde.kate.desktop"};
     const auto saved = m_settings.value("dock/pins", defaults).toStringList();
     for (const auto &id : saved) if (find(id) && !m_pins.contains(id) && m_pins.size() < 8) m_pins << id;
     auto watcher = new QFileSystemWatcher(this);
+    const auto dockFile = m_settings.fileName();
+    const auto dockDirectory = QFileInfo(dockFile).absolutePath();
+    QDir().mkpath(dockDirectory); watcher->addPath(dockDirectory);
+    if (QFile::exists(dockFile)) watcher->addPath(dockFile);
     const auto config = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
     QDir().mkpath(config); watcher->addPath(config);
-    connect(watcher, &QFileSystemWatcher::directoryChanged, this, [this] { emit appearanceChanged(); });
+    connect(watcher, &QFileSystemWatcher::directoryChanged, this, [this, watcher, dockFile] {
+        if (QFile::exists(dockFile) && !watcher->files().contains(dockFile)) watcher->addPath(dockFile);
+        reloadDockSettings(); emit appearanceChanged();
+    });
     if (QFile::exists(config + "/kdeglobals")) watcher->addPath(config + "/kdeglobals");
-    connect(watcher, &QFileSystemWatcher::fileChanged, this, [this, watcher, config] {
+    connect(watcher, &QFileSystemWatcher::fileChanged, this, [this, watcher, config, dockFile] {
         if (QFile::exists(config + "/kdeglobals") && !watcher->files().contains(config + "/kdeglobals")) watcher->addPath(config + "/kdeglobals");
-        emit appearanceChanged();
+        if (QFile::exists(dockFile) && !watcher->files().contains(dockFile)) watcher->addPath(dockFile);
+        reloadDockSettings(); emit appearanceChanged();
     });
     connect(KSycoca::self(), &KSycoca::databaseChanged, this, [this] { reload(); emit applicationsChanged(); emit pinsChanged(); });
 }
@@ -132,6 +143,15 @@ void Synaqua::openSettings(const QString &module) {
     if (!allowed.contains(module)) { fail("Unknown settings page."); return; }
     if (!QProcess::startDetached("systemsettings", {module})) fail("System Settings could not be started.");
 }
+void Synaqua::openDockSettings() {
+    hideMenu();
+    if (!QProcess::startDetached("systemsettings", {"kcm_synaqua_dock"}))
+        fail("System Settings could not be started. Run synaqua-shell --settings to open dock preferences.");
+}
+void Synaqua::reloadDockSettings() {
+    m_settings.sync(); const auto updated = DockPreferences::read(m_settings);
+    if (m_dock != updated) { m_dock = updated; emit dockSettingsChanged(); }
+}
 void Synaqua::updateRegions(const QRectF &dock, const QRectF &menu, const QRectF &toast, bool open) {
     if (!m_view || m_preview) return;
     const auto errorRegion = m_error.isEmpty() ? QRegion() : rounded(toast);
@@ -142,6 +162,7 @@ void Synaqua::updateRegions(const QRectF &dock, const QRectF &menu, const QRectF
     KWindowEffects::enableBlurBehind(m_view, true, glass);
     if (KWindowSystem::isPlatformWayland()) {
         auto layer = LayerShellQt::Window::get(m_view);
+        layer->setExclusiveZone(qCeil(m_view->height() - dock.y() + 6));
         layer->setKeyboardInteractivity(open ? LayerShellQt::Window::KeyboardInteractivityExclusive : LayerShellQt::Window::KeyboardInteractivityNone);
     }
     if (open) m_view->requestActivate();

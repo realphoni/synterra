@@ -46,7 +46,7 @@ mount -t tmpfs tmpfs "$root/run"; mounted+=("$root/run")
 chroot "$root" /bin/bash -euxc '
     pacman-key --init
     pacman-key --populate archlinux
-    pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg qt6-declarative qt6-wayland layer-shell-qt kservice kio kglobalaccel kwindowsystem kirigami plasma-workspace plasma-desktop grub librsvg ttf-dejavu
+    pacman -Syu --noconfirm archlinux-keyring archiso rust gcc cmake ninja pkgconf qt6-webengine qt6-svg qt6-declarative qt6-wayland layer-shell-qt kservice kio kglobalaccel kwindowsystem kcmutils kcoreaddons kirigami plasma-workspace plasma-desktop grub librsvg ttf-dejavu
     bash /root/synterra/scripts/build-arch.sh
 '
 cp -a "$root/root/synterra/out/." "$repo/out/"

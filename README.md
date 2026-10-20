@@ -2,37 +2,47 @@
 
 An Arch-based x86_64 live distribution with Synaqua, our new Aero-inspired desktop-shell preview using KWin/Plasma services.
 
-Current release: **Synterra 1.1 Build 1165 (Prism)** with the first **Synaqua 0.1 desktop-shell preview**. [Synaqua guide](docs/SYNAQUA.md).
+Current release: **Synterra 1.1 Build 1170 (Prism)** with the **Synaqua 0.2 desktop-shell preview and configurable dock**. [Synaqua guide](docs/SYNAQUA.md).
 
 ## Download the live ISO
 
-Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1165 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1165). The image is 2,596,274,176 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
+Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 Build 1170 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1170). The image is 2,595,487,744 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
 On Linux, put all four files in one folder, then verify and join them:
 
 ```bash
 sha256sum -c SHA256SUMS.parts
-cat synterra-1.1.1165-x86_64.iso.part00 synterra-1.1.1165-x86_64.iso.part01 > synterra-1.1.1165-x86_64.iso
+cat synterra-1.1.1170-x86_64.iso.part00 synterra-1.1.1170-x86_64.iso.part01 > synterra-1.1.1170-x86_64.iso
 sha256sum -c SHA256SUMS
 ```
 
 On Windows, use Command Prompt to join the parts:
 
 ```cmd
-copy /b synterra-1.1.1165-x86_64.iso.part00+synterra-1.1.1165-x86_64.iso.part01 synterra-1.1.1165-x86_64.iso
+copy /b synterra-1.1.1170-x86_64.iso.part00+synterra-1.1.1170-x86_64.iso.part01 synterra-1.1.1170-x86_64.iso
 ```
 
 Then check the assembled ISO in PowerShell:
 
 ```powershell
-Get-FileHash .\synterra-1.1.1165-x86_64.iso -Algorithm SHA256
+Get-FileHash .\synterra-1.1.1170-x86_64.iso -Algorithm SHA256
 ```
 
-Expected SHA-256: `ac025a37c68dcb0ada245595dfbf77b828f38ff53c7a57d7f11f5356e4dfb3b2`.
+Expected SHA-256: `a5880a1528629446204475dbdf8412d3d669d65358c696e2d546d4e3c78a5002`.
 
 Attach the assembled `.iso` to a VMware test VM's virtual CD/DVD drive. The parts themselves are not bootable. This is an experimental live image; see the testing and installation limitations below.
 
-## New in Synterra 1.1 Build 1165
+## New in Synterra 1.1 Build 1170
+
+- **Synaqua Dock in Settings:** open **System Settings → Appearance & Style → Synaqua Dock**, Start → Dock settings, or its card in Synterra Hub. Right-click empty dock space for the same page.
+- **Size and width:** shrink the dock to 60% or enlarge it to 125%; extend its width up to the available screen width. Start remains centered and narrow layouts leave room for pinned apps.
+- **Spacing and position:** choose icon spacing and distance from the screen edge, plus Compact/Balanced/Wide presets and Restore Defaults.
+- **Visibility:** show or hide the clock/date, Synaqua branding and running-window controls.
+- **Apply without restarting:** preferences persist per user, preserve pins/wallpaper/Glass mode and update the space reserved for maximized windows.
+
+See the [dock settings guide](docs/SYNAQUA.md#dock-settings). `synaqua-shell --settings` opens the standalone settings dialog.
+
+## Included from Synterra 1.1 Build 1165
 
 - **Synaqua 0.1 preview** begins our own desktop shell: a floating glass dock, centered Start button and pinned applications on both sides, based on the supplied sketch.
 - **Searchable Start menu** lists installed apps, supports keyboard navigation and launches standard desktop entries through KIO. Stars add or remove up to eight persistent dock pins.
@@ -115,7 +125,7 @@ Surf remains an early browser: extensions, a password manager and Firefox profil
 
 ### Update Surf 1.1.1 on an earlier Synterra installation
 
-Build 1165 already includes Surf 1.1.1. The archive below updates the browser on earlier installations; it does not install Synaqua or upgrade the OS build.
+Build 1170 already includes Surf 1.1.1. The archive below updates the browser on earlier installations; it does not install Synaqua or upgrade the OS build.
 
 Download `synterra-surf-1.1.1-linux-x86_64.tar.gz` and `SHA256SUMS.surf` from the [Build 1130 release](https://github.com/realphoni/synterra/releases/tag/v1.1.1130). Put both downloads in one folder and close Surf, then run:
 
@@ -215,7 +225,7 @@ Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, i
 
 ## Finish a partial installation
 
-The recovery helper can finish a mounted partial installation. Build 1165 opens it when the installation target is already mounted, without running the partitioner again. It asks for `REPAIR` before making changes.
+The recovery helper can finish a mounted partial installation. Build 1170 opens it when the installation target is already mounted, without running the partitioner again. It asks for `REPAIR` before making changes.
 
 The older published 0.2 ISO can stop with `display-manager.service already exists ... cosmic-greeter.service` if Archinstall selected COSMIC's greeter. The installer source is corrected: the base stage leaves greeter selection to Archinstall, then Synterra finalization explicitly selects SDDM. The existing ISO assets have not been rebuilt with this fix.
 

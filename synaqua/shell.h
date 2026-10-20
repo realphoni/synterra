@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QQuickView>
 #include <KService>
+#include "dockconfig.h"
 
 class Synaqua final : public QObject {
     Q_OBJECT
@@ -18,6 +19,13 @@ class Synaqua final : public QObject {
     Q_PROPERTY(QString userName READ userName CONSTANT)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool menuOpen READ isMenuOpen WRITE setMenuOpen NOTIFY menuOpenChanged)
+    Q_PROPERTY(int dockScale READ dockScale NOTIFY dockSettingsChanged)
+    Q_PROPERTY(int dockWidth READ dockWidth NOTIFY dockSettingsChanged)
+    Q_PROPERTY(int dockSpacing READ dockSpacing NOTIFY dockSettingsChanged)
+    Q_PROPERTY(int dockMargin READ dockMargin NOTIFY dockSettingsChanged)
+    Q_PROPERTY(bool showClock READ showClock NOTIFY dockSettingsChanged)
+    Q_PROPERTY(bool showBranding READ showBranding NOTIFY dockSettingsChanged)
+    Q_PROPERTY(bool showWindows READ showWindows NOTIFY dockSettingsChanged)
 public:
     explicit Synaqua(bool preview, QObject *parent = nullptr);
     QVariantList applications() const;
@@ -44,7 +52,16 @@ public:
     Q_INVOKABLE void updateRegions(const QRectF &dock, const QRectF &menu, const QRectF &toast, bool open);
     bool selfTest();
     void setMenuOpen(bool open);
+    int dockScale() const { return m_dock.scale; }
+    int dockWidth() const { return m_dock.width; }
+    int dockSpacing() const { return m_dock.spacing; }
+    int dockMargin() const { return m_dock.margin; }
+    bool showClock() const { return m_dock.clock; }
+    bool showBranding() const { return m_dock.branding; }
+    bool showWindows() const { return m_dock.windows; }
+    Q_INVOKABLE void openDockSettings();
 public slots:
+    void reloadDockSettings();
     void toggleMenu();
     void showMenu() { setMenuOpen(true); }
     void hideMenu() { setMenuOpen(false); }
@@ -55,11 +72,13 @@ signals:
     void appearanceChanged();
     void errorChanged();
     void menuOpenChanged();
+    void dockSettingsChanged();
 private:
     struct App { QString id, name, icon, description; KService::Ptr service; };
     QList<App> m_apps;
     QStringList m_pins;
     QSettings m_settings;
+    DockPreferences m_dock;
     QString m_query, m_error;
     bool m_preview;
     bool m_menuOpen = false;

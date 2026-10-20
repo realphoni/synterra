@@ -201,6 +201,11 @@ pub fn validate(repo: &Path) -> Result {
     let session = fs::read_to_string(root.join("etc/sddm.conf.d/10-synterra.conf"))?;
     require(session.contains("Session=synaqua.desktop"), "Live session must select Synaqua")?;
     require(repo.join("synaqua/desktop-layout.js").is_file(), "Separate Synaqua layout missing")?;
+    for component in ["dockconfig.h", "docksettings.cpp", "dockkcm.cpp", "dockkcm.json"] {
+        require(repo.join("synaqua").join(component).is_file(), format!("Dock settings component missing: {component}"))?;
+    }
+    let dock_kcm: serde_json::Value = serde_json::from_slice(&fs::read(repo.join("synaqua/dockkcm.json"))?)?;
+    require(dock_kcm["KPlugin"]["Name"] == "Synaqua Dock", "Dock settings metadata missing")?;
     require(
         !root
             .join("etc/skel/.config/fastfetch/config.jsonc")

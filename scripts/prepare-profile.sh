@@ -25,6 +25,7 @@ install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libe
 cmake -S "$repo/synaqua" -B "$repo/target/synaqua" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$repo/target/synaqua" --parallel 2
 install -Dm755 "$repo/target/synaqua/synaqua-shell" "$dest/airootfs/usr/local/bin/synaqua-shell"
+install -Dm755 "$repo/target/synaqua/kcm_synaqua_dock.so" "$dest/airootfs/usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_synaqua_dock.so"
 # Keep upstream desktop views, lock-screen and logout components with their
 # original licenses; Synaqua's dock/launcher and session layout are separate.
 shell="$dest/airootfs/usr/share/plasma/shells/org.synterra.synaqua"
@@ -69,6 +70,7 @@ install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$payload/usr/lib/q
 install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-appearance" "$payload/usr/local/bin/synterra-appearance"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-appearance.desktop" "$payload/usr/share/applications/synterra-appearance.desktop"
 install -Dm755 "$repo/target/synaqua/synaqua-shell" "$payload/usr/local/bin/synaqua-shell"
+install -Dm755 "$repo/target/synaqua/kcm_synaqua_dock.so" "$payload/usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_synaqua_dock.so"
 for helper in start-synaqua; do
     install -Dm755 "$repo/profile/airootfs/usr/local/bin/$helper" "$payload/usr/local/bin/$helper"
 done
@@ -97,7 +99,7 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="1.1.1165"
+iso_version="1.1.1170"
 # Zstandard keeps live-image decompression fast and bounds build CPU usage.
 airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M' '-processors' '4')
@@ -110,6 +112,8 @@ file_permissions+=(
   ["/usr/local/bin/synterra-hub"]="0:0:755"
   ["/usr/local/bin/synterra-appearance"]="0:0:755"
   ["/usr/local/bin/synaqua-shell"]="0:0:755"
+  ["/usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_synaqua_dock.so"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_synaqua_dock.so"]="0:0:755"
   ["/usr/local/bin/start-synaqua"]="0:0:755"
   ["/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
   ["/usr/local/libexec/synaqua-autostart"]="0:0:755"

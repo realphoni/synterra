@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Name": "Synaqua Dock",
+        "Description": "Dock size, width, spacing and layout",
+        "Icon": "preferences-desktop-theme",
+        "Version": "0.2.0",
+        "License": "MIT"
+    },
+    "X-KDE-System-Settings-Parent-Category": "appearance",
+    "X-KDE-Keywords": "Synaqua,dock,size,width,spacing,panel,glass,scale",
+    "X-KDE-Weight": 75
+}
