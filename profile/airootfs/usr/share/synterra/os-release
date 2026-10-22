@@ -1,11 +1,11 @@
 NAME="Synterra"
-PRETTY_NAME="Synterra 1.1 Build 1170"
+PRETTY_NAME="Synterra 2.0 Build 2010"
 ID=synterra
 ID_LIKE=arch
-VERSION_ID=1.1
-VERSION="1.1 Build 1170 (Prism)"
-BUILD_ID=1170
-VERSION_CODENAME=prism
+VERSION_ID=2.0
+VERSION="2.0 Build 2010 (Variscite)"
+BUILD_ID=2010
+VERSION_CODENAME=variscite
 ANSI_COLOR="38;2;125;183;255"
 LOGO=synterra
 HOME_URL="https://github.com/realphoni/synterra"

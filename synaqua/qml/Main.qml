@@ -111,7 +111,7 @@ FocusScope {
                 ToolButton { text: "Lock"; palette.buttonText: root.ink; onClicked: { root.closeMenu(); synaqua.lockScreen() } }
                 ToolButton { text: "Power"; palette.buttonText: root.ink; onClicked: { root.closeMenu(); synaqua.openSessionDialog() } }
             }
-            Label { text: "Synterra 1.1 · Build 1170 · Synaqua 0.2"; color: root.subtle; font.pixelSize: 10; Layout.alignment: Qt.AlignHCenter }
+            Label { text: "Synterra 2.0 · Build 2010 · Synaqua 0.2"; color: root.subtle; font.pixelSize: 10; Layout.alignment: Qt.AlignHCenter }
         }
     }
     GlassPane {
@@ -128,7 +128,7 @@ FocusScope {
             id: brand; objectName: "dockBranding"
             x: 18 * root.dockScale; anchors.verticalCenter: parent.verticalCenter; spacing: 3; visible: synaqua.showBranding && leftGroup.x > 236 * root.dockScale
             Text { text: "SYNAQUA"; color: root.ink; font.pixelSize: 10 * root.dockScale; font.weight: Font.DemiBold; font.letterSpacing: 2 }
-            Text { text: "PRISM / 1170"; color: root.subtle; font.pixelSize: 8 * root.dockScale; font.letterSpacing: 1 }
+            Text { text: "VARISCITE / 2010"; color: root.subtle; font.pixelSize: 8 * root.dockScale; font.letterSpacing: 1 }
         }
         TaskManager.TasksModel { id: tasks; groupMode: TaskManager.TasksModel.GroupDisabled; filterByVirtualDesktop: false }
         ListView {

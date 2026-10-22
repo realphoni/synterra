@@ -2,9 +2,44 @@
 
 An Arch-based x86_64 live distribution with Synaqua, the Aero-inspired Synaqua desktop using KWin/Plasma services.
 
+Development release: **Synterra 2.0 (Variscite), Build 2010**, introducing **Synterra Updates**. Download the [Build 2010 prerelease](https://github.com/realphoni/synterra/releases/tag/v2.0.2010). The 1.1 full release remains available below.
+
+## Download Synterra 2.0 Build 2010
+
+Download both `synterra-2.0.2010-x86_64.iso.part00` and `.part01`, plus `SHA256SUMS` and `SHA256SUMS.parts`, from the [release page](https://github.com/realphoni/synterra/releases/tag/v2.0.2010). Join and verify them on Linux:
+
+```bash
+sha256sum -c SHA256SUMS.parts
+cat synterra-2.0.2010-x86_64.iso.part00 synterra-2.0.2010-x86_64.iso.part01 > synterra-2.0.2010-x86_64.iso
+sha256sum -c SHA256SUMS
+```
+
+On Windows, join them in Command Prompt:
+
+```cmd
+copy /b synterra-2.0.2010-x86_64.iso.part00+synterra-2.0.2010-x86_64.iso.part01 synterra-2.0.2010-x86_64.iso
+```
+
+Then run `Get-FileHash .\synterra-2.0.2010-x86_64.iso -Algorithm SHA256` in PowerShell. Expected SHA-256: `b9edd7cb4c4a03300aa62da3712a2639ca3adb96837e6f3153a264bf4cdb3602`. Assembled size: **2,580,152,320 bytes**. The parts themselves are not bootable.
+
+This is a prerelease for testing. It fixes live-session sudo permissions and has passed desktop boot checks; full disk installation and end-to-end installed release upgrades still need validation. The updater accepts full releases, so this prerelease is not installed automatically.
+
+## New in Synterra 2.0 Build 2010
+
+- **Synterra Updates:** open it from Start or Synterra Hub. It checks the official GitHub releases, downloads a newer compatible release package and verifies its SHA-256 checksum.
+- **Your choice after download:** choose Update now or Later. Installing opens an administrator-assisted terminal and retains pacman's package-review prompts. No installation or reboot runs automatically.
+- **Reusable downloads:** verified packages stay in your user cache for later. Progress, cancellation, offline errors, GitHub rate limits and damaged downloads are handled.
+- **Release packaging:** future full releases include a `synterra-update.json` manifest and a `synterra-release-*.pkg.tar.zst` desktop package. The administrator helper independently rechecks GitHub and the package before installing. Existing files, Surf profiles and per-user dock/Glass settings are retained.
+- **Variscite artwork and branding:** a new jade and teal glass wallpaper replaces the Aurora default across the desktop, sign-in and GRUB. Graphite and the original source artwork are retained. Hub, Surf, the installer and dock identify 2.0 Build 2010.
+- **Live installer permissions:** corrects the world-writable sudoers directory inherited from Windows copies. A real sudo regression test checks the built live filesystem and the startup repair.
+
+Release upgrades are disabled in the live environment. The separate Arch package-update button remains available after installation. See the [updater guide and release protocol](docs/UPDATES.md).
+
 Current full release: **Synterra 1.1 (Prism)**, Build 1170, with **Synaqua 0.2 and its configurable dock**. [Synaqua guide](docs/SYNAQUA.md).
 
 ## Download the live ISO
+
+**1.1 setup issue:** if sudo reports `/etc/sudoers.d is world writable`, follow the [live-session recovery instructions](docs/LIVE-SUDO-RECOVERY.md). This is an image permission defect; creating a different administrator account does not fix it. The published 1.1.0 ISO remains affected.
 
 Get the two ISO parts, `SHA256SUMS` and `SHA256SUMS.parts` from the [Synterra 1.1 release](https://github.com/realphoni/synterra/releases/tag/v1.1.0). The image is 2,595,487,744 bytes (about 2.42 GiB), exceeding GitHub's 2 GiB limit per release asset, so it is distributed in two parts.
 
@@ -143,7 +178,7 @@ The archive targets current x86_64 Arch/Synterra systems. It requires Qt librari
 
 ## Desktop
 
-- Aurora wallpaper by default; Graphite available in the wallpaper picker. Both original 3840 × 2160 PNGs are included unchanged.
+- Variscite glass wallpaper by default; Graphite remains available in the wallpaper picker. Both original Prism 3840 × 2160 source PNGs are retained. The new Variscite image is 1672 × 941.
 - Synterra Glass light/dark Plasma styles: translucent glass, highlight edges and blur masks.
 - Matching Synterra Glass Aurorae window frames: smooth translucent side borders, pale title text, glossy buttons and a red close button.
 - Bottom taskbar with launcher, pinned applications, tray, clock and Show Desktop.
@@ -186,7 +221,7 @@ sudo bash scripts/build-manjaro.sh
 
 The script verifies the official Arch bootstrap signature against the installed Arch keyring, creates an isolated Arch chroot in `/var/tmp`, installs Arch's build tools there, generates a profile from that version's `releng` template, and builds the live image. Host Manjaro repositories and installed desktop are untouched. Logs and ISO checksums are written under `out/`. The build root is retained for inspection. It can contain tens of GB; unmount it before removing it manually.
 
-On a native Arch build host, install `archiso`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `qt6-svg`, `qt6-declarative`, `qt6-wayland`, `layer-shell-qt`, `kservice`, `kio`, `kglobalaccel`, `kwindowsystem`, `kirigami`, `plasma-workspace`, `plasma-desktop`, `grub`, `librsvg` and `ttf-dejavu`, then run:
+On a native Arch build host, install `archiso`, `fakeroot`, `libarchive`, `rust`, `gcc`, `cmake`, `ninja`, `pkgconf`, `qt6-webengine`, `qt6-svg`, `qt6-declarative`, `qt6-wayland`, `layer-shell-qt`, `kservice`, `kio`, `kglobalaccel`, `kwindowsystem`, `kirigami`, `plasma-workspace`, `plasma-desktop`, `grub`, `librsvg` and `ttf-dejavu`, then run:
 
 ```bash
 sudo bash scripts/build-arch.sh
@@ -199,7 +234,7 @@ sudo bash scripts/build-arch.sh
 Boot the generated ISO in a separate test VM (Other Linux 6.x 64-bit, UEFI, 3D acceleration enabled). Keep Manjaro as the builder. Verify:
 
 1. The live session enters Synaqua automatically as `live`.
-2. Aurora and the desktop shortcuts are visible, the floating dock has a centered Start button, and glass frames have working minimize/maximize/close buttons.
+2. Variscite and the desktop shortcuts are visible, the floating dock has a centered Start button, and glass frames have working minimize/maximize/close buttons.
 3. Test Start search, pinning, running-window controls, network/sound settings, resize, clipboard and the wallpaper picker.
 4. `cat /etc/os-release` identifies Synterra; `pacman -Si plasma-desktop` uses Arch repositories.
 5. Verify the Synterra GRUB splash on UEFI. Reboot and test the Syslinux fallback on BIOS.
@@ -219,7 +254,7 @@ Installed systems select Synaqua by default, with Plasma (Wayland) available in 
 
 ## GRUB splash
 
-The splash uses your original Aurora wallpaper unchanged. Arrow keys select an entry; Enter boots, E edits and C opens GRUB's console. Theme sources live in `assets/grub/`; the builder generates fonts and glass frame PNGs using GRUB and librsvg.
+The splash uses the Variscite wallpaper. Arrow keys select an entry; Enter boots, E edits and C opens GRUB's console. Theme sources live in `assets/grub/`; the builder generates fonts and glass frame PNGs using GRUB and librsvg.
 
 Installed GRUB systems keep the theme under `/boot/grub/themes/SynterraPrism`, including when `/boot` is separate from an encrypted root. Settings live in `/etc/default/grub.d/10-synterra.cfg`; `/etc/default/grub` retains its existing disk and kernel options. To refresh the theme on an installed Synterra GRUB system, run `sudo /usr/local/libexec/synterra-grub-setup`.
 
@@ -244,7 +279,7 @@ The helper checks the mounted root, installed packages and (on UEFI) the mounted
 - desktop/: native Qt Synterra Hub, Glass widget plugin and preview checks.
 - `profile/packages.txt`: extra packages layered onto upstream Arch releng.
 - `profile/airootfs/`: branding, live-session configuration and desktop defaults.
-- `assets/wallpapers/`: supplied originals, copied to the image during profile generation.
+- `assets/wallpapers/`: the Variscite default, its generation prompt and supplied Prism originals.
 - `assets/grub/`: GRUB layout, live loader and BIOS splash artwork.
 - `docs/BUILD-STATUS.md`: actual validation and VMware status.
 

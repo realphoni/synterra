@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         }
         bus.registerObject("/Synaqua", &backend, QDBusConnection::ExportAllSlots);
     }
-    QQuickView view; backend.setView(&view); view.setTitle("Synaqua · Synterra 1.1 Build 1170");
+    QQuickView view; backend.setView(&view); view.setTitle("Synaqua · Synterra 2.0 Build 2010");
     view.setColor(Qt::transparent); view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.rootContext()->setContextProperty("synaqua", &backend);
     if (!windowed) {

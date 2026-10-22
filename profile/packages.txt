@@ -58,3 +58,4 @@ kcalc
 bluedevil
 bluez
 bluez-utils
+libarchive

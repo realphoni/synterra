@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Synterra Updates
+Comment=Check for new Synterra releases and download verified updates
+Exec=synterra-updates
+Icon=synterra-updates
+Terminal=false
+Categories=System;Settings;
+Keywords=Update;Upgrade;Synterra;Variscite;

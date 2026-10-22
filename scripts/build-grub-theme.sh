@@ -10,8 +10,8 @@ font=/usr/share/fonts/TTF/DejaVuSans.ttf
 [[ -f $font ]] || { echo 'Install ttf-dejavu on the build host.' >&2; exit 1; }
 mkdir -p "$dest"
 install -m644 "$repo/assets/grub/theme.txt" "$dest/theme.txt"
-# Keep the supplied Aurora wallpaper unchanged; GRUB scales it to the display.
-install -m644 "$repo/assets/wallpapers/Prism-aurora-4K.png" "$dest/background.png"
+# Use the Variscite artwork unchanged; GRUB scales it to the display.
+install -m644 "$repo/assets/wallpapers/Variscite.png" "$dest/background.png"
 rsvg-convert -w 96 -h 96 "$repo/profile/airootfs/usr/share/icons/hicolor/scalable/apps/synterra.svg" -o "$dest/logo.png"
 install -m644 "$repo/assets/grub/bios-splash.svg" "$dest/bios-splash.svg"
 rsvg-convert "$dest/bios-splash.svg" -o "$dest/bios-splash.png"

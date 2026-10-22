@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+[[ $EUID == 0 && -d /run/archiso ]] || { echo 'Live setup requires the live ISO and root.' >&2; exit 1; }
+# Check the policy before display-manager starts, including directory permissions.
+install -d -o root -g root -m755 /etc/sudoers.d
+chown root:root /etc/sudoers /etc/sudoers.d/10-synterra-live
+chmod 440 /etc/sudoers /etc/sudoers.d/10-synterra-live
+visudo -c
 if ! id live >/dev/null 2>&1; then
     useradd --create-home --shell /bin/bash --groups wheel live
     passwd --delete live
 fi
+# Real privilege elevation is tested by test-live-sudo.sh in an isolated root.
+# Avoid opening a PAM user session here before SDDM establishes the desktop.

@@ -96,6 +96,11 @@ pub fn validate(repo: &Path) -> Result {
         let h = u32::from_be_bytes(data[20..24].try_into()?);
         require((w, h) == (3840, 2160), "Wrong wallpaper dimensions")?;
     }
+    let variscite = fs::read(repo.join("assets/wallpapers/Variscite.png"))?;
+    require(variscite.len() >= 24 && &variscite[..8] == b"\x89PNG\r\n\x1a\n", "Invalid Variscite wallpaper")?;
+    let width = u32::from_be_bytes(variscite[16..20].try_into()?);
+    let height = u32::from_be_bytes(variscite[20..24].try_into()?);
+    require(width >= 1600 && height >= 900 && (width as f64 / height as f64 - 16.0 / 9.0).abs() < 0.02, "Variscite wallpaper must be a landscape desktop image")?;
     for path in fs::read_dir(repo.join("scripts"))?.chain(fs::read_dir(root.join("usr/local/bin"))?)
     {
         let path = path?.path();
@@ -166,6 +171,7 @@ pub fn validate(repo: &Path) -> Result {
         "rust",
         "cargo",
         "qt6-webengine",
+        "libarchive",
         "spectacle",
         "gwenview",
         "okular",
@@ -193,6 +199,8 @@ pub fn validate(repo: &Path) -> Result {
         "usr/local/libexec/synterra-plasma-shell",
         "usr/local/libexec/synaqua-autostart",
         "usr/share/wayland-sessions/synaqua.desktop",
+        "usr/share/applications/synterra-updates.desktop",
+        "usr/share/icons/hicolor/scalable/apps/synterra-updates.svg",
         "usr/lib/systemd/user/synaqua-shell.service",
         "etc/systemd/user/plasma-plasmashell.service.d/10-synaqua.conf",
     ] {

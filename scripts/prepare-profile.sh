@@ -8,6 +8,7 @@ upstream=${ARCHISO_PROFILE:-/usr/share/archiso/configs/releng}
 mkdir -p "$dest"
 cp -a "$upstream/." "$dest/"
 cp -a "$repo/profile/airootfs/." "$dest/airootfs/"
+bash "$repo/scripts/normalize-overlay.sh" "$dest/airootfs"
 rm -f "$dest/airootfs/etc/skel/.config/fastfetch/config.jsonc" \
     "$dest/airootfs/usr/share/synterra/fastfetch-logo.txt"
 command -v cargo >/dev/null || { echo 'Install Rust and Cargo on the Arch build host.' >&2; exit 1; }
@@ -21,6 +22,11 @@ cmake -S "$repo/desktop" -B "$repo/target/hub" -G Ninja -DCMAKE_BUILD_TYPE=Relea
 cmake --build "$repo/target/hub" --parallel 2
 install -Dm755 "$repo/target/hub/synterra-hub" "$dest/airootfs/usr/local/bin/synterra-hub"
 install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$dest/airootfs/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
+cmake -S "$repo/updater" -B "$repo/target/updater" -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build "$repo/target/updater" --parallel 2
+ctest --test-dir "$repo/target/updater" --output-on-failure
+install -Dm755 "$repo/target/updater/synterra-updates" "$dest/airootfs/usr/local/bin/synterra-updates"
+install -Dm755 "$repo/target/updater/synterra-release-update" "$dest/airootfs/usr/local/libexec/synterra-release-update"
 install -Dm755 "$repo/scripts/recover-install.sh" "$dest/airootfs/usr/local/libexec/synterra-recover"
 cmake -S "$repo/synaqua" -B "$repo/target/synaqua" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$repo/target/synaqua" --parallel 2
@@ -66,6 +72,9 @@ install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-surf.desk
 install -Dm755 "$repo/target/hub/synterra-hub" "$payload/usr/local/bin/synterra-hub"
 install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-welcome" "$payload/usr/local/bin/synterra-welcome"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-hub.desktop" "$payload/usr/share/applications/synterra-hub.desktop"
+install -Dm755 "$repo/target/updater/synterra-updates" "$payload/usr/local/bin/synterra-updates"
+install -Dm755 "$repo/target/updater/synterra-release-update" "$payload/usr/local/libexec/synterra-release-update"
+install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-updates.desktop" "$payload/usr/share/applications/synterra-updates.desktop"
 install -Dm755 "$repo/target/hub/styles/libSynterraGlass.so" "$payload/usr/lib/qt6/plugins/styles/libSynterraGlass.so"
 install -Dm755 "$repo/profile/airootfs/usr/local/bin/synterra-appearance" "$payload/usr/local/bin/synterra-appearance"
 install -Dm644 "$repo/profile/airootfs/usr/share/applications/synterra-appearance.desktop" "$payload/usr/share/applications/synterra-appearance.desktop"
@@ -99,17 +108,26 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="1.1.0"
+iso_version="2.0.2010"
 # Zstandard keeps live-image decompression fast and bounds build CPU usage.
 airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M' '-processors' '4')
 file_permissions+=(
+  # Archiso treats a trailing slash as recursive; /. changes only the root.
+  ["/."]="0:0:755"
+  ["/etc"]="0:0:755"
+  ["/etc/sudoers"]="0:0:440"
+  ["/etc/sudoers.d"]="0:0:755"
   ["/usr/local/bin/synterra-live-setup"]="0:0:755"
   ["/usr/local/bin/synterra-welcome"]="0:0:755"
   ["/usr/local/bin/synterra-install"]="0:0:755"
   ["/usr/local/libexec/synterra-tools"]="0:0:755"
   ["/usr/local/bin/synterra-surf"]="0:0:755"
   ["/usr/local/bin/synterra-hub"]="0:0:755"
+  ["/usr/local/bin/synterra-updates"]="0:0:755"
+  ["/usr/local/libexec/synterra-release-update"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/synterra-updates"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synterra-release-update"]="0:0:755"
   ["/usr/local/bin/synterra-appearance"]="0:0:755"
   ["/usr/local/bin/synaqua-shell"]="0:0:755"
   ["/usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_synaqua_dock.so"]="0:0:755"
@@ -117,6 +135,9 @@ file_permissions+=(
   ["/usr/local/bin/start-synaqua"]="0:0:755"
   ["/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
   ["/usr/local/libexec/synaqua-autostart"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/bin/start-synaqua"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
+  ["/usr/share/synterra/install-overlay/usr/local/libexec/synaqua-autostart"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/synaqua-shell"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/bin/start-synaqua"]="0:0:755"
   ["/usr/share/synterra/install-overlay/usr/local/libexec/synterra-plasma-shell"]="0:0:755"
@@ -141,8 +162,15 @@ PROFILE
 for variant in aurora graphite; do
     wall="$dest/airootfs/usr/share/wallpapers/Synterra-$variant"
     mkdir -p "$wall/contents/images"
-    cp "$repo/assets/wallpapers/Prism-$variant-4K.png" "$wall/contents/images/3840x2160.png"
-    printf '{"KPlugin":{"Id":"Synterra-%s","Name":"Synterra Prism %s","License":"LicenseRef-User-Supplied"}}\n' "$variant" "$variant" > "$wall/metadata.json"
+    if [[ $variant == aurora ]]; then
+        # Keep the existing URI so selecting the default on an older install
+        # follows the replacement artwork without rewriting personal settings.
+        cp "$repo/assets/wallpapers/Variscite.png" "$wall/contents/images/3840x2160.png"
+        printf '{"KPlugin":{"Id":"Synterra-aurora","Name":"Synterra Variscite","License":"MIT"}}\n' > "$wall/metadata.json"
+    else
+        cp "$repo/assets/wallpapers/Prism-$variant-4K.png" "$wall/contents/images/3840x2160.png"
+        printf '{"KPlugin":{"Id":"Synterra-%s","Name":"Synterra Prism %s","License":"LicenseRef-User-Supplied"}}\n' "$variant" "$variant" > "$wall/metadata.json"
+    fi
 done
 mkdir -p "$payload/usr/share/wallpapers"
 cp -a "$dest/airootfs/usr/share/wallpapers/Synterra-aurora" "$dest/airootfs/usr/share/wallpapers/Synterra-graphite" "$payload/usr/share/wallpapers/"
@@ -170,4 +198,6 @@ for bootdir in grub efiboot syslinux; do
         find "$dest/$bootdir" -type f \( -name '*.cfg' -o -name '*.conf' \) -exec sed -i 's/Arch Linux/Synterra/g; s/Synterra install medium/Synterra Live Desktop/g' {} +
     fi
 done
+bash "$repo/scripts/normalize-payload.sh" "$payload"
+bash "$repo/scripts/package-update.sh" "$payload" "$repo/out"
 echo "Prepared $dest"

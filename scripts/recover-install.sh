@@ -35,6 +35,7 @@ if (( ${#users[@]} == 0 )); then
     [[ $username =~ ^[a-z_][a-z0-9_-]{0,31}$ && $username != live ]] || { echo 'Invalid username.' >&2; exit 1; }
     arch-chroot "$target" useradd -m -s /bin/bash -G wheel "$username"
     arch-chroot "$target" passwd "$username"
+    install -d -o root -g root -m755 "$target/etc/sudoers.d"
     printf '%%wheel ALL=(ALL:ALL) ALL\n' | install -m440 /dev/stdin "$target/etc/sudoers.d/20-synterra-admin"
     arch-chroot "$target" visudo -c
     users=("$username")
