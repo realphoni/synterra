@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(synterra_updates VERSION 2.0.2010 LANGUAGES CXX)
+project(synterra_updates VERSION 2.0.2020 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets Network Test)

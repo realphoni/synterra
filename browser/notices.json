@@ -1,0 +1,23 @@
+[
+  {"id":"roblox","title":"Roblox","type":"warning","domains":["roblox.com"],"terms":["roblox"],"message":"Review content maturity, chat and spending controls before a child plays. Roblox provides parental controls for these settings.","source":"https://en.help.roblox.com/hc/en-us/articles/30428310121620-Parental-Controls-Overview"},
+  {"id":"openai","title":"OpenAI","type":"information","domains":["openai.com"],"terms":["openai","open ai"],"message":"OpenAI introduced ChatGPT in November 2022.","source":"https://openai.com/index/chatgpt/"},
+  {"id":"chatgpt","title":"ChatGPT","type":"information","domains":["chatgpt.com","chat.openai.com"],"terms":["chatgpt","chat gpt"],"message":"ChatGPT is an AI chatbot developed by OpenAI. Its answers can be incorrect; double-check important information.","source":"https://openai.com/index/chatgpt/"},
+  {"id":"gemini","title":"Gemini","type":"warning","domains":["gemini.google.com"],"terms":["google gemini","gemini ai","gemini"],"message":"Gemini can get things wrong. Double-check important answers, and avoid entering confidential information.","source":"https://support.google.com/gemini/answer/13594961?hl=en"},
+  {"id":"x","title":"X","type":"information","playful":true,"domains":["x.com"],"terms":["x.com"],"message":"It's called Twitter."},
+  {"id":"twitter","title":"Twitter","type":"information","playful":true,"domains":["twitter.com"],"terms":["twitter"],"message":"It's called X."},
+  {"id":"momentum","title":"Momentum","type":"information","playful":true,"terms":["tactco momentum","tactico momentum","momentum memory"],"message":"Momentum is a local cross-provider memory layer designed by TACT\\CO."},
+  {"id":"tactico","title":"Tactico","type":"information","playful":true,"terms":["tactico","tactco","tact\\co"],"message":"Tactico is working on Pathways, VSE and Momentum."},
+  {"id":"germany","title":"Germany","type":"information","playful":true,"terms":["germany","deutschland"],"message":"Germany is a good country."},
+  {"id":"ace-attorney","title":"Ace Attorney","type":"information","playful":true,"domains":["ace-attorney.com"],"terms":["ace attorney","gyakuten saiban"],"message":"Very good game! Play it.","rareMessage":"when is ace attorney 7 coming out"},
+  {"id":"phoni-technology","title":"Phoni Technology","type":"information","playful":true,"terms":["phoni technology"],"message":"Phoni Technology is developing Synterra, PTMusic and more."},
+  {"id":"synterra","title":"Synterra","type":"information","terms":["synterra"],"message":"Your distro, your home. Synterra 2.0 · Variscite · Build 2020.","source":"https://github.com/realphoni/synterra"},
+  {"id":"klkl","title":"klkl","type":"information","playful":true,"terms":["klkl"],"message":"Cool dude."},
+  {"id":"phoni","title":"Phoni","type":"information","playful":true,"terms":["phoni","phoni1rbx"],"message":"Cool dude."},
+  {"id":"steam","title":"Steam","type":"information","playful":true,"domains":["steampowered.com","steamcommunity.com"],"terms":["steam","gaben"],"message":"Give Gaben his 250th yacht already."},
+  {"id":"wattpad","title":"Wattpad","type":"information","playful":true,"domains":["wattpad.com"],"terms":["wattpad"],"message":"Inferior to AO3."},
+  {"id":"ao3","title":"Archive of Our Own","type":"warning","domains":["archiveofourown.org","ao3.org"],"terms":["ao3","archive of our own"],"message":"Some works contain explicit adult content or disturbing themes. Read ratings, tags and archive warnings before opening a work.","source":"https://secure.ao3.org/faq/posting-and-editing?language_id=en"},
+  {"id":"sweden","title":"Sweden","type":"information","playful":true,"terms":["sweden","sverige"],"message":"Det är väldigt kallt här. Pack a jumper."},
+  {"id":"scp","title":"SCP","type":"information","playful":true,"domains":["scp-wiki.wikidot.com","scp-int.wikidot.com"],"terms":["scp","scp foundation"],"message":"Secure. Contain. Protect. Fiction, thankfully."},
+  {"id":"jarona","title":"Jarona","type":"information","playful":true,"terms":["jarona"],"message":"Jarona!"},
+  {"id":"anthropic","title":"Anthropic","type":"information","domains":["anthropic.com","claude.ai","claude.com"],"terms":["anthropic","claude ai"],"message":"Claude is Anthropic's AI assistant. Check important answers against reliable sources.","source":"https://www.anthropic.com/claude"}
+]

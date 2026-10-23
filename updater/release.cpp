@@ -86,7 +86,7 @@ static void transfer(const QUrl &url, qint64 size, QIODevice &output, std::atomi
     require(allowedUrl(url, fixture), "Refusing an untrusted update address.");
     require(!cancel, "Download cancelled.");
     QNetworkAccessManager manager; QNetworkRequest request(url);
-    request.setRawHeader("User-Agent", "Synterra-Updates/2.0.2010");
+    request.setRawHeader("User-Agent", "Synterra-Updates/2.0.2020");
     request.setRawHeader("Accept", "application/vnd.github+json");
     request.setRawHeader("X-GitHub-Api-Version", "2022-11-28");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::UserVerifiedRedirectPolicy);

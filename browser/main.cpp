@@ -17,6 +17,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QRandomGenerator>
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QMenu>
@@ -26,6 +27,7 @@
 #include <QShortcut>
 #include <QStandardPaths>
 #include <QStatusBar>
+#include <QStyle>
 #include <QTabWidget>
 #include <QTimer>
 #include <QToolBar>
@@ -41,6 +43,8 @@
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QWebEngineView>
+#include <QWebEngineUrlRequestInfo>
+#include <QWebEngineUrlRequestInterceptor>
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -51,9 +55,21 @@
 #include <QSaveFile>
 #include <QtTest/QTest>
 #include "state.h"
+#include "notices.h"
 #include "../desktop/appearance.h"
 
 static const QUrl homeUrl(QStringLiteral("qrc:/surf/start.html"));
+
+// Automated fixtures may use a real-looking base URL for the address bar.
+// Keep every test request, including automatic favicons, off the public web.
+class FixtureRequests final : public QWebEngineUrlRequestInterceptor {
+public:
+    explicit FixtureRequests(QObject *parent) : QWebEngineUrlRequestInterceptor(parent) {}
+    void interceptRequest(QWebEngineUrlRequestInfo &info) override {
+        const auto url = info.requestUrl();
+        if ((url.scheme() == "https" || url.scheme() == "http") && url.host() != "127.0.0.1") info.block(true);
+    }
+};
 
 static QUrl destination(QString input) {
     input = input.trimmed();
@@ -91,6 +107,13 @@ class Surf final : public QMainWindow {
     QProgressBar *pageProgress = new QProgressBar(this);
     QWidget *noticeBar = new QWidget(this);
     QLabel *noticeText = new QLabel(noticeBar);
+    QWidget *topicBar = new QWidget(this);
+    QLabel *topicIcon = new QLabel(topicBar), *topicHeading = new QLabel(topicBar), *topicText = new QLabel(topicBar);
+    QPushButton *topicSource = new QPushButton("Read more", topicBar), *topicNext = new QPushButton(topicBar), *topicDismiss = new QPushButton("Dismiss", topicBar);
+    QHash<QWebEngineView *, SurfNotices::TabState> topicStates;
+    QHash<QWebEngineView *, QHash<QString, quint32>> topicVariants;
+    bool noticesEnabled = true, searchNotices = true, playfulNotices = true;
+    QUrl currentNoticeSource;
     QHash<QWebEngineView *, QPointer<QDialog>> inspectors;
     QWidget *findBar = new QWidget(this);
     QLineEdit *findInput = new QLineEdit(findBar);
@@ -112,6 +135,42 @@ class Surf final : public QMainWindow {
             current()->setProperty("surfStopped", true);
             current()->stop();
         } else current()->reload();
+    }
+    void syncTopicNotice() {
+        auto view = current();
+        currentNoticeSource.clear();
+        if (!view || !noticesEnabled) { topicBar->hide(); return; }
+        auto &state = topicStates[view];
+        const auto context = view->url().adjusted(QUrl::RemoveFragment | QUrl::RemoveUserInfo).toString();
+        if (state.context != context) { state.context = context; state.selected = 0; }
+        const auto matches = SurfNotices::visible(SurfNotices::match(view->url(), searchNotices, playfulNotices), state);
+        if (matches.isEmpty()) { topicBar->hide(); return; }
+        state.selected %= matches.size();
+        const auto &entry = matches[state.selected];
+        const auto &notice = entry.notice;
+        auto &variants = topicVariants[view];
+        if (!variants.contains(notice.id)) variants.insert(notice.id, QRandomGenerator::global()->generate());
+        const QString kind = notice.warning ? "Warning" : "Information";
+        topicHeading->setText(kind + " · " + notice.title + (entry.searchTopic ? " · Search topic" : " · This site"));
+        topicText->setText(SurfNotices::message(notice, variants.value(notice.id)));
+        topicBar->setProperty("tone", notice.warning ? "warning" : "information");
+        topicIcon->setText(notice.warning ? QString::fromUtf8("⚠") : QString::fromUtf8("ⓘ"));
+        topicIcon->setAccessibleName(kind);
+        currentNoticeSource = notice.source;
+        topicSource->setVisible(!currentNoticeSource.isEmpty());
+        topicSource->setToolTip(currentNoticeSource.toDisplayString());
+        topicNext->setVisible(matches.size() > 1);
+        topicNext->setText(QString("Next · %1/%2").arg(state.selected + 1).arg(matches.size()));
+        topicBar->style()->unpolish(topicBar); topicBar->style()->polish(topicBar);
+        topicBar->show();
+    }
+    void dismissTopicNotice() {
+        auto view = current();
+        if (!view) return;
+        auto &state = topicStates[view];
+        const auto matches = SurfNotices::visible(SurfNotices::match(view->url(), searchNotices, playfulNotices), state);
+        if (!matches.isEmpty()) state.dismissed.insert(matches[state.selected % matches.size()].notice.id);
+        state.selected = 0; syncTopicNotice();
     }
     void updateTab(QWebEngineView *view) {
         const int index = tabs->indexOf(view);
@@ -228,21 +287,31 @@ class Surf final : public QMainWindow {
         QDialog dialog(this); dialog.setWindowTitle("Surf settings"); QVBoxLayout layout(&dialog);
         QCheckBox restore("Restore my open web tabs when Surf starts"); restore.setChecked(settings.value("restoreSession", false).toBool());
         QCheckBox dark("Dark browser toolbar"); dark.setChecked(settings.value("darkToolbar", false).toBool());
+        QCheckBox notices("Show site and search notices"); notices.setChecked(noticesEnabled);
+        QCheckBox searches("Include search-topic notices"); searches.setChecked(searchNotices);
+        QCheckBox playful("Include playful messages"); playful.setChecked(playfulNotices);
+        QLabel noticePrivacy("Notices are matched on this device using site addresses and supported search URLs.\nSurf does not scan page content or send notice checks to a server."); noticePrivacy.setWordWrap(true);
         QLabel note("Private windows never save browsing history or sessions.\nDownloads and bookmarks you save are kept on disk."); note.setWordWrap(true);
         QDialogButtonBox buttons(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-        layout.addWidget(&restore); layout.addWidget(&dark); layout.addWidget(&note); layout.addWidget(&buttons);
+        layout.addWidget(&restore); layout.addWidget(&dark); layout.addWidget(&notices); layout.addWidget(&searches); layout.addWidget(&playful); layout.addWidget(&noticePrivacy); layout.addWidget(&note); layout.addWidget(&buttons);
         connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
         connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
         if (dialog.exec() != QDialog::Accepted) return;
         settings.setValue("restoreSession", restore.isChecked());
         if (!restore.isChecked()) settings.remove("session");
         settings.setValue("darkToolbar", dark.isChecked()); applyStyle(); saveSession();
+        noticesEnabled = notices.isChecked(); searchNotices = searches.isChecked(); playfulNotices = playful.isChecked();
+        settings.setValue("noticesEnabled", noticesEnabled); settings.setValue("searchNotices", searchNotices); settings.setValue("playfulNotices", playfulNotices);
+        syncTopicNotice();
     }
     void applyStyle() {
         const bool dark = privateMode || settings.value("darkToolbar", false).toBool() || GlassAppearance::dark();
-        setStyleSheet(dark
+        const QString noticeStyle = dark
+            ? "QWidget#surfTopicNotice {background:#1b3546; color:#ebf7ff; border-bottom:1px solid #53788d;} QWidget#surfTopicNotice[tone=\"warning\"] {background:#493a20; border-bottom:1px solid #aa8645;} QWidget#surfTopicNotice QLabel {background:transparent; color:#ebf7ff;} QWidget#surfTopicNotice QPushButton {background:rgba(255,255,255,18); color:#ebf7ff; border:1px solid #7791a0; border-radius:6px; padding:5px 9px;} QWidget#surfTopicNotice QPushButton:hover {background:rgba(255,255,255,40);}"
+            : "QWidget#surfTopicNotice {background:#e5f3fb; color:#183b50; border-bottom:1px solid #a3c9de;} QWidget#surfTopicNotice[tone=\"warning\"] {background:#fff1cf; border-bottom:1px solid #d8b563;} QWidget#surfTopicNotice QLabel {background:transparent; color:#183b50;} QWidget#surfTopicNotice QPushButton {background:rgba(255,255,255,128); color:#183b50; border:1px solid #a2bdca; border-radius:6px; padding:5px 9px;} QWidget#surfTopicNotice QPushButton:hover {background:#ffffff;}";
+        setStyleSheet((dark
             ? "QToolBar {background:#1d2940; color:#e6f0ff; padding:7px; spacing:6px;} QLineEdit {background:#273955; color:#f1f6ff; border:1px solid #5476a0; border-radius:10px; padding:8px 12px; min-width:180px;} QToolButton {color:#e6f0ff; padding:7px; border-radius:6px;} QToolButton:hover {background:#354b70;} QTabBar::tab {padding:9px 17px;}"
-            : "QToolBar {background:#e7f0fa; padding:7px; spacing:6px; border-bottom:1px solid #bdcede;} QLineEdit {background:white; color:#19354e; border:1px solid #b6cee4; border-radius:10px; padding:8px 12px; min-width:180px;} QToolButton {padding:7px; border-radius:6px;} QToolButton:hover {background:#cfe4f6;} QTabBar::tab {padding:9px 17px;}");
+            : "QToolBar {background:#e7f0fa; padding:7px; spacing:6px; border-bottom:1px solid #bdcede;} QLineEdit {background:white; color:#19354e; border:1px solid #b6cee4; border-radius:10px; padding:8px 12px; min-width:180px;} QToolButton {padding:7px; border-radius:6px;} QToolButton:hover {background:#cfe4f6;} QTabBar::tab {padding:9px 17px;}") + noticeStyle);
     }
     void trackDownload(QWebEngineDownloadRequest *download, const QString &path) {
         download->setDownloadDirectory(QFileInfo(path).absolutePath());
@@ -300,6 +369,7 @@ class Surf final : public QMainWindow {
         pageProgress->setValue(view->property("surfProgress").toInt()); pageProgress->setVisible(loading);
         muteAction->setChecked(view->page()->isAudioMuted());
         noticeText->setText(view->property("surfError").toString()); noticeBar->setVisible(!noticeText->text().isEmpty());
+        syncTopicNotice();
         zoomLabel->setText(QString::number(qRound(view->zoomFactor() * 100)) + "%");
         setWindowTitle((view->title().isEmpty() ? "New tab" : view->title()) + " — Synterra Surf" + (privateMode ? " · Private" : ""));
         statusBar()->showMessage(view->url().scheme() == "https" ? "HTTPS" : view->url() == homeUrl ? privateMode ? "Private window · downloads are saved to disk" : "Welcome to Synterra Surf" : view->url().scheme().toUpper());
@@ -312,6 +382,7 @@ class Surf final : public QMainWindow {
         const auto url = qobject_cast<QWebEngineView *>(view)->url();
         if (webAddress(url)) { closedTabs.append(url.toString()); if (closedTabs.size() > 10) closedTabs.removeFirst(); }
         tabs->removeTab(index);
+        topicStates.remove(qobject_cast<QWebEngineView *>(view)); topicVariants.remove(qobject_cast<QWebEngineView *>(view));
         if (auto inspector = inspectors.take(qobject_cast<QWebEngineView *>(view))) delete inspector;
         delete view;
         if (!tabs->count()) addTab(homeUrl);
@@ -354,6 +425,7 @@ protected:
     }
 public:
     explicit Surf(bool privateWindow = false) : profile(privateWindow ? new QWebEngineProfile(this) : new QWebEngineProfile("SynterraSurf", this)), privateMode(privateWindow) {
+        noticesEnabled = settings.value("noticesEnabled", true).toBool(); searchNotices = settings.value("searchNotices", true).toBool(); playfulNotices = settings.value("playfulNotices", true).toBool();
         resize(1180, 790);
         setWindowIcon(QIcon::fromTheme("synterra-surf"));
         const auto data = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -372,7 +444,23 @@ public:
         noticeLayout->addWidget(noticeText, 1); noticeLayout->addWidget(retry); noticeLayout->addWidget(dismiss); noticeBar->hide();
         connect(retry, &QPushButton::clicked, this, [this] { if (current()) current()->reload(); });
         connect(dismiss, &QPushButton::clicked, this, [this] { if (current()) current()->setProperty("surfError", QString()); noticeBar->hide(); });
-        vertical->addWidget(pageProgress); vertical->addWidget(noticeBar); vertical->addWidget(tabs); vertical->addWidget(findBar); setCentralWidget(central);
+        topicBar->setObjectName("surfTopicNotice");
+        auto topicLayout = new QHBoxLayout(topicBar); topicLayout->setContentsMargins(14, 10, 14, 10); topicLayout->setSpacing(12);
+        auto textLayout = new QVBoxLayout; textLayout->setSpacing(3);
+        topicHeading->setTextFormat(Qt::PlainText); topicText->setTextFormat(Qt::PlainText);
+        topicHeading->setWordWrap(true); topicText->setWordWrap(true);
+        topicHeading->setTextInteractionFlags(Qt::TextSelectableByMouse); topicText->setTextInteractionFlags(Qt::TextSelectableByMouse);
+        auto headingFont = topicHeading->font(); headingFont.setBold(true); topicHeading->setFont(headingFont);
+        auto iconFont = topicIcon->font(); iconFont.setPointSize(22); topicIcon->setFont(iconFont);
+        topicIcon->setMinimumWidth(28); textLayout->addWidget(topicHeading); textLayout->addWidget(topicText);
+        topicLayout->addWidget(topicIcon); topicLayout->addLayout(textLayout, 1); topicLayout->addWidget(topicSource); topicLayout->addWidget(topicNext); topicLayout->addWidget(topicDismiss);
+        topicDismiss->setAccessibleName("Dismiss this Surf notice"); topicDismiss->setToolTip("Hide this topic in this tab until you choose Show notices for this tab.");
+        topicNext->setAccessibleName("Next matching Surf notice");
+        connect(topicDismiss, &QPushButton::clicked, this, [this] { dismissTopicNotice(); });
+        connect(topicNext, &QPushButton::clicked, this, [this] { if (current()) { ++topicStates[current()].selected; syncTopicNotice(); } });
+        connect(topicSource, &QPushButton::clicked, this, [this] { const QUrl source = currentNoticeSource; if (!source.isEmpty()) addTab(source); });
+        topicBar->hide();
+        vertical->addWidget(pageProgress); vertical->addWidget(noticeBar); vertical->addWidget(topicBar); vertical->addWidget(tabs); vertical->addWidget(findBar); setCentralWidget(central);
         auto findLayout = new QHBoxLayout(findBar); findInput->setPlaceholderText("Find in page");
         auto previous = new QPushButton("Previous", findBar), next = new QPushButton("Next", findBar), done = new QPushButton("Done", findBar);
         findLayout->addWidget(findInput); findLayout->addWidget(findResult); findLayout->addWidget(previous); findLayout->addWidget(next); findLayout->addWidget(done); findBar->hide();
@@ -413,10 +501,14 @@ public:
         menu->addAction("Save page as PDF", this, [this] { savePdf(); });
         menu->addAction("Full screen (F11)", this, [this] { fullscreen(); });
         menu->addAction("Developer tools (F12)", this, [this] { developerTools(); });
+        menu->addAction("Show notices for this tab", this, [this] { if (current()) { noticesEnabled = true; topicStates[current()].dismissed.clear(); syncTopicNotice(); } });
+        auto noticesAction = menu->addAction("Site and search notices"); noticesAction->setCheckable(true);
+        connect(menu, &QMenu::aboutToShow, this, [this, noticesAction] { noticesAction->setChecked(noticesEnabled); });
+        connect(noticesAction, &QAction::triggered, this, [this](bool enabled) { noticesEnabled = enabled; if (!privateMode) settings.setValue("noticesEnabled", enabled); syncTopicNotice(); });
         menu->addSeparator();
         menu->addAction("Settings", this, [this] { preferences(); })->setEnabled(!privateMode);
         menu->addAction("About Surf", this, [this] {
-            QMessageBox::about(this, "Synterra Surf", QString("<h2>Synterra Surf %1</h2><p>Synterra 2.0 · Build 2010 · Variscite</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+Shift+M mute · F12 developer tools<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>").arg(QStringLiteral(SURF_VERSION)));
+            QMessageBox::about(this, "Synterra Surf", QString("<h2>Synterra Surf %1</h2><p>Synterra 2.0 · Build 2020 · Variscite</p><p>Powered by Qt WebEngine. Private windows use an isolated memory profile; downloaded files and saved bookmarks remain on disk.</p><p>Ctrl+L address · Ctrl+T new tab · Ctrl+D bookmark<br>Ctrl+F find · Ctrl+H history · Ctrl+J downloads<br>Ctrl+Shift+T reopen · Ctrl+Shift+N private window<br>Ctrl+Shift+M mute · F12 developer tools<br>Ctrl+W close · Ctrl+R reload · Ctrl++ / Ctrl+- zoom</p>").arg(QStringLiteral(SURF_VERSION)));
         });
         applyStyle(); GlassAppearance::watch(this, [this] { applyStyle(); });
         zoomLabel->setMinimumWidth(48); statusBar()->addPermanentWidget(zoomLabel);
@@ -461,6 +553,7 @@ public:
     }
     void reopen() { if (!closedTabs.isEmpty()) addTab(QUrl(closedTabs.takeLast())); }
     QStringList startupTabs() { return savedTabs(settings, privateMode); }
+    void isolateSmokeRequests() { profile->setUrlRequestInterceptor(new FixtureRequests(profile)); }
     bool smokeWidgets() {
         activateWindow(); current()->setFocus(); QTest::qWait(100); QTest::keyClick(current(), Qt::Key_F, Qt::ControlModifier); findInput->setText("Synterra");
         if (!findBar->isVisible()) { std::cerr << "FAIL: Ctrl+F did not reveal find bar.\n"; return false; }
@@ -500,6 +593,81 @@ public:
     bool downloadTestPassed() const { return smokeDownloadSaved && activeDownloads == 0; }
     void smokePdf(const QString &path) { smokePdfPath = path; QApplication::setActiveWindow(this); current()->setFocus(); QTest::qWait(150); QTest::keyClick(current(), Qt::Key_P, Qt::ControlModifier); }
     bool pdfTestPassed() const { return smokePdfSaved; }
+    bool smokeNotices() {
+        auto wait = [](auto condition) { for (int i = 0; i < 120; ++i) { if (condition()) return true; QTest::qWait(25); } return condition(); };
+        auto fail = [](const char *message) { std::cerr << "FAIL: notice " << message << '\n'; return false; };
+        const auto original = current();
+        const bool oldEnabled = noticesEnabled, oldSearch = searchNotices, oldPlayful = playfulNotices;
+        const auto oldDark = settings.value("darkToolbar");
+        noticesEnabled = searchNotices = playfulNotices = true;
+        const auto capture = [this](const QString &name) {
+            const auto directory = qEnvironmentVariable("SYNTERRA_SURF_NOTICE_SCREENSHOTS");
+            if (directory.isEmpty()) return true;
+            QDir().mkpath(directory); QTest::qWait(80);
+            return grab().save(QDir(directory).filePath(name + ".png"));
+        };
+        auto view = addTab(QUrl(), true, false);
+        const QString fixture = "<!doctype html><meta charset='utf-8'><title>Surf notice preview</title><style>body{font:18px sans-serif;background:#edf4f7;color:#234;padding:70px}h1{font-weight:500}</style><h1>Site and search notices</h1><p>This local test page makes no external requests.</p><p>The notice above belongs to Surf, outside the web page.</p>";
+        view->setHtml(fixture, QUrl("https://www.roblox.com/"));
+        if (!wait([&] { return topicBar->isVisible() && !view->page()->isLoading(); }) || !topicHeading->text().contains("Warning · Roblox · This site") || !topicSource->isVisible()) return fail("site warning/source");
+        const auto source = currentNoticeSource;
+        const auto tabCount = tabs->count(); topicSource->click();
+        if (!wait([&] { return tabs->count() == tabCount + 1 && current() != view && current()->page()->requestedUrl() == source; })) return fail("source opens in a new tab");
+        closeTab(tabs->currentIndex()); tabs->setCurrentWidget(view);
+        view->setProperty("surfError", "Recovery test"); syncNavigation();
+        if (!noticeBar->isVisible() || !topicBar->isVisible()) return fail("recovery coexistence");
+        view->setProperty("surfError", QString()); syncNavigation();
+        settings.setValue("darkToolbar", false); applyStyle();
+        if (!capture("notices-warning-light")) return fail("light capture");
+        settings.setValue("darkToolbar", true); applyStyle();
+        if (!capture("notices-warning-dark")) return fail("dark capture");
+        settings.setValue("darkToolbar", false); applyStyle();
+        topicDismiss->click(); syncNavigation();
+        if (topicBar->isVisible()) return fail("dismissal did not survive navigation refresh");
+        auto other = addTab(QUrl(), true, false); other->setHtml(fixture, QUrl("https://www.roblox.com/"));
+        if (!wait([&] { return topicBar->isVisible() && !other->page()->isLoading(); })) return fail("dismissal leaked to another tab");
+        closeTab(tabs->indexOf(other)); tabs->setCurrentWidget(view);
+        if (topicBar->isVisible()) return fail("dismissed notice returned on tab switch");
+        topicStates[view].dismissed.clear(); syncTopicNotice();
+        if (!topicBar->isVisible()) return fail("restore notice");
+        view->setHtml(fixture, QUrl("https://duckduckgo.com/?q=steam+ao3"));
+        if (!wait([&] { return !view->page()->isLoading() && topicHeading->text().contains("Archive of Our Own · Search topic"); }) || !topicNext->isVisible()) return fail("search topic/priority");
+        topicNext->click();
+        if (!topicHeading->text().contains("Information · Steam") || topicSource->isVisible() || topicBar->property("tone") != "information") return fail("next/playful notice");
+        if (!capture("notices-search")) return fail("search capture");
+        resize(680, 790); QTest::qWait(80);
+        if (topicDismiss->geometry().right() > topicBar->width() || topicText->width() < 120 || !capture("notices-narrow")) return fail("narrow layout");
+        resize(1180, 790);
+        playfulNotices = false; syncTopicNotice();
+        if (!topicHeading->text().contains("Archive of Our Own") || topicNext->isVisible()) return fail("playful preference");
+        searchNotices = false; syncTopicNotice();
+        if (topicBar->isVisible()) return fail("search preference");
+        searchNotices = playfulNotices = true;
+        topicVariants[view].insert("ace-attorney", 0);
+        view->setHtml(fixture, QUrl("https://duckduckgo.com/?q=ace+attorney"));
+        if (!wait([&] { return !view->page()->isLoading() && topicText->text() == "when is ace attorney 7 coming out"; })) return fail("rare copy");
+        syncNavigation(); if (topicText->text() != "when is ace attorney 7 coming out") return fail("rare copy flicker");
+        noticesEnabled = false; syncTopicNotice(); if (topicBar->isVisible()) return fail("disable notices");
+        noticesEnabled = true;
+        view->setHtml(fixture, QUrl("https://roblox.com.evil.example/?q=ao3"));
+        if (!wait([&] { return view->url().host() == "roblox.com.evil.example" && !view->page()->isLoading(); })) return fail("unrelated fixture");
+        syncTopicNotice(); if (topicBar->isVisible()) return fail("spoofed site");
+        {
+            Surf privateWindow(true); privateWindow.noticesEnabled = true; privateWindow.isolateSmokeRequests();
+            auto privateView = privateWindow.addTab(QUrl(), true, false);
+            privateView->setHtml(fixture, QUrl("https://www.roblox.com/")); privateWindow.show();
+            if (!wait([&] { return privateWindow.topicBar->isVisible() && !privateView->page()->isLoading(); })) return fail("private notice");
+            privateWindow.topicDismiss->click();
+            if (privateWindow.topicBar->isVisible() || !privateWindow.profile->isOffTheRecord()) return fail("private dismissal");
+            privateWindow.close();
+        }
+        closeTab(tabs->indexOf(view)); tabs->setCurrentWidget(original);
+        noticesEnabled = oldEnabled; searchNotices = oldSearch; playfulNotices = oldPlayful;
+        if (oldDark.isValid()) settings.setValue("darkToolbar", oldDark); else settings.remove("darkToolbar");
+        applyStyle(); syncNavigation();
+        std::cout << "PASS: site/search notices, warning priority, sources, cycling, dismissal/restore, tab/private isolation, preferences, rare copy, dark/light and narrow layouts.\n";
+        return true;
+    }
     bool smokeWebsite(const QUrl &base) {
         auto wait = [](auto condition) {
             for (int i = 0; i < 200; ++i) { if (condition()) return true; QTest::qWait(25); }
@@ -625,6 +793,7 @@ public:
 int main(int argc, char **argv) {
     if (argc > 1 && QString(argv[1]) == "--self-test") {
         QCoreApplication app(argc, argv);
+        if (!SurfNotices::catalogError().isEmpty()) { std::cerr << SurfNotices::catalogError().toStdString() << '\n'; return 1; }
         if (destination("example.com") != QUrl("https://example.com") || destination("localhost:8443").port() != 8443 || destination("https://example.org/a").scheme() != "https" || QUrlQuery(destination("glass & prism")).queryItemValue("q") != "glass & prism" || destination("javascript:alert(1)").isValid() || destination("file:///etc/passwd").isValid() || destination("file:///home/example.txt").isValid()) return 1;
         if (destination("localhost:8443/a?x=1").port() != 8443 || destination("example.org/a:b").path() != "/a:b" || destination("example.org:99999/path").isValid() || destination("user:pass@example.org").isValid() || destination("[::1]:8443/a").port() != 8443) return 1;
         QTemporaryDir directory; if (!directory.isValid()) return 1;
@@ -653,6 +822,7 @@ int main(int argc, char **argv) {
     app.setApplicationDisplayName("Synterra Surf");
     Surf window(app.arguments().contains("--private"));
     const bool smoke = app.arguments().contains("--smoke-test");
+    if (smoke) window.isolateSmokeRequests();
     QTemporaryDir downloadDirectory;
     QTcpServer fixture;
     if (smoke) {
@@ -697,6 +867,7 @@ int main(int argc, char **argv) {
                     if (!window.downloadTestPassed()) { std::cerr << "FAIL: local HTTP download/progress completion.\n"; app.exit(1); return; }
                     if (!window.pdfTestPassed()) { std::cerr << "FAIL: Ctrl+P PDF export.\n"; app.exit(1); return; }
                     if (!window.smokeWebsite(QUrl(QString("http://127.0.0.1:%1/").arg(fixture.serverPort())))) { app.exit(1); return; }
+                    if (!window.smokeNotices()) { app.exit(1); return; }
                     const auto path = qEnvironmentVariable("SYNTERRA_SURF_SCREENSHOT");
                     if (!path.isEmpty() && !window.grab().save(path)) { app.exit(1); return; }
                     std::cout << "PASS: Chromium rendering, find, tabs, private profile, downloads, fullscreen, zoom, bookmarks, PDF, async JavaScript/fetch/storage, popup/background/close, mute, address editing, DevTools lifecycle, stop/error and renderer recovery.\n"; app.exit(0);

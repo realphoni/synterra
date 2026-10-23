@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Install Synterra
-Comment=Guided installation of Synterra 2.0 Build 2010 (Variscite)
+Comment=Guided installation of Synterra 2.0 Build 2020 (Variscite)
 Exec=synterra-install
 Icon=synterra
 Categories=System;

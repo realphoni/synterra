@@ -97,7 +97,7 @@ pub fn install() -> Result {
     if !Path::new(PAYLOAD).join("etc/skel").is_dir() {
         return Err("Installer desktop payload is missing.".into());
     }
-    println!("\nSynterra 2.0 Build 2010 installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
+    println!("\nSynterra 2.0 Build 2020 installer\n\nConnect to the internet first. Arch's guided installer will ask for disks,\npartitions, timezone, bootloader and a password-protected administrator.\nReview its disk summary carefully: formatting destroys existing data.\nKeep the KDE Plasma profile and Synterra package list selected.\n\nIMPORTANT: At Archinstall's completion screen choose EXIT, not Reboot.\nSynterra must finish applying its desktop before you restart.\n\nPress Enter to start, or type cancel to leave.");
     let mut answer = String::new();
     io::stdin().read_line(&mut answer)?;
     if !answer.trim().is_empty() {

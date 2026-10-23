@@ -1,59 +1,67 @@
-# Build status — 2026-10-22
+# Build status — 2026-10-23
 
-Synterra 2.0 (Variscite), Build 2010 is a **development prerelease**, tagged [v2.0.2010](https://github.com/realphoni/synterra/releases/tag/v2.0.2010). The existing public 1.1 download is unchanged; this build is published for testing rather than marked Latest.
+Synterra 2.0 (Variscite), Build 2020 is a [development prerelease](https://github.com/realphoni/synterra/releases/tag/v2.0.2020) focused on Surf
+1.2.0. The released Build 2010 remains
+available, with its validation recorded in [the archived status](BUILD-STATUS-2010.md).
 
-- Image: `synterra-2.0.2010-x86_64.iso`
-- Size: 2,580,152,320 bytes
-- SHA-256: `b9edd7cb4c4a03300aa62da3712a2639ca3adb96837e6f3153a264bf4cdb3602`
-- Desktop package: `synterra-release-2.0.2010-1-x86_64.pkg.tar.zst`
-- Package size: 6,708,381 bytes
-- Package SHA-256: `ab6e47f61bb1a85cee527ea7abe1c24f6f4d0d473482ca5d1c66efe22bdfc8e6`
-- Update manifest and checksums: `synterra-update.json`, `SHA256SUMS.update`
+## Browser changes
 
-The image reuses the verified 1.1 Arch package/kernel base and replaces Synterra's applications, installed desktop payload, branding and boot artwork. It is not a fresh update of all Arch packages. The normal full Archiso build remains available through the repository's build scripts.
+The native notice strip provides information, warnings, source links, per-tab
+dismissal/restore and cycling for multiple matches. It follows the active tab,
+has light/dark styling and wraps on smaller windows. Settings can disable all
+notices, search-topic matching or playful notes independently. Matching uses
+local domain/search rules and sends no extra notice requests. The 21-topic
+catalog includes a stable rare Ace Attorney variant. The requested attribution
+prefixes are removed. See [the notice guide](SURF-NOTICES.md).
 
-## Setup correction
-
-Inspection of the released 1.1.0 image reproduced the reported defect: `/etc/sudoers.d` is root-owned but mode `0777`; sudo rejects it and ignores the live user's rule. The image's `/` and `/etc` also inherited `0777` from Windows copies. The administrator account chosen in Archinstall is unrelated to this live-session failure.
-
-Build 2010 explicitly sets root ownership and mode `0755` on these directories and `0440` on the policy files. Overlay normalization prevents synthetic DrvFS modes from reaching future builds. Live setup checks policy syntax before the display manager starts. Real elevation is tested separately to avoid opening a PAM user session before SDDM. The installed desktop payload does not include live accounts or passwordless sudo.
-
-The real sudo regression passed against the candidate's extracted filesystem and again on the final staged root: valid syntax, successful elevation as `live`, rejection after reproducing mode `0777`, successful startup repair, and no grant to an unrelated account. The final ISO's helper hash and policy modes match the tested input. The regression runs in a disposable mount namespace and overlay. A text-console root login using the live image's PAM configuration also succeeded in isolation, verifying the [recovery instructions for the existing 1.1 ISO](LIVE-SUDO-RECOVERY.md).
-
-The candidate also booted in a disposable UEFI VM. Root console login succeeded,
-`runuser -u live -- sudo -n id` returned UID 0, all three repaired directories
-were root-owned `0755`, and `synterra-live-setup.service` was active. This verifies
-the reported sudo failure is fixed in the running candidate.
-
-The actual installed Archiso overlay-copy function also passed a fixture check:
-root/policy modes, ordinary data remaining `0644`, and executable live/installed
-helpers. Root is overridden with `/.` because Archiso interprets a trailing slash
-as recursive. Explicit overrides also guarantee executable permissions for the
-installed Synaqua session wrappers.
-
-## Variscite and Synterra Updates
-
-Synterra Updates checks the official GitHub Releases API, downloads a newer compatible full release and verifies its size and SHA-256 before offering Update now or Later. The administrator helper rechecks the release and package and keeps pacman's package-review prompts. No installation or reboot happens automatically. See the [release update protocol and limits](UPDATES.md).
-
-The new Variscite default wallpaper uses jade, teal and blue glass ribbons inspired by Prism. The original generated asset is 1672×941; it is not a native 4K image. The desktop, sign-in theme and GRUB share it. The legacy wallpaper URI is retained for compatibility, and Graphite remains available. The source artwork and generation prompt are in `assets/wallpapers/`.
+Build 2020 also updates the visible distribution build in Surf, Hub, Synaqua,
+the installer, updater, sign-in screen and boot artwork. It retains the Variscite
+wallpaper, Glass modes and the Build 2010 setup-permission correction.
 
 ## Validation
 
-Source validation, installer regressions, Surf self-tests, native compilation and updater tests passed. Updater tests exercise numeric versions, full-release policy, manifest/asset mismatch, unsafe package contents, actual HTTP streaming, cache reuse/repair, oversized/corrupt downloads, cancellation and refused redirects.
+The native notice tests and the full Qt/Chromium browser smoke test passed as
+an unprivileged user with sandboxing enabled. The tests cover source buttons,
+per-tab/private dismissal, restore, warning priority, cycling, preferences,
+stable rare copy, light/dark/narrow layouts, and the existing JavaScript,
+download, PDF, popup, DevTools and page-recovery checks. External requests,
+including automatic favicons, are blocked during the fixture tests.
 
-An actual pacman installation into an isolated root verified migration of an unowned Synterra file, package ownership, retained dock settings and Surf bookmark fixtures, and exclusion of live accounts/autologin. This is not a complete installed-system release upgrade. The native updater rendered in the live image's runtime and previously opened in the running candidate, querying the real public GitHub feed successfully.
+Rust validation and installer regressions passed. The actual Archiso permission
+overrides and real live-sudo regression also passed against the staged root.
+The final ISO's root/policy permissions, branding and filesystem checksum passed.
+The exact tested browser binary is present in both live and installed payloads,
+the desktop update package and the browser-only archive. Its SHA-256 is
+`2d2a3f1003680811320e89d38d5d36b6ae519ae8494e7f6a1d7be646de832a32`.
 
-The final ISO's filesystem checksum, live/installed updater binary hashes, Unix permissions, branding and exact wallpaper bytes passed inspection. BIOS and UEFI menus booted from the final image and were visually inspected with Variscite art.
+BIOS and UEFI boot menus from the final ISO were captured and visually checked;
+both show Build 2020 and the Variscite artwork. A fresh full desktop boot and
+installation cycle were not rerun for this build. The browser itself was
+visually checked under Xvfb; the previous full desktop boot is recorded in the
+Build 2010 status.
 
-The final image then booted through UEFI with its default configuration in a
-disposable standard-VGA QEMU VM. The new Variscite wallpaper, folder-view desktop
-shortcuts and Synaqua dock rendered correctly. The capture is saved locally as
-`out/2010-work/live-latest-2010.png`. No renderer override was applied to this boot.
-The VM closed automatically after capture. Large generated filesystem copies
-were removed, retaining source, compiled caches and release artifacts.
+## Release artifacts
 
-## Remaining validation
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `synterra-2.0.2020-x86_64.iso` | 2,580,217,856 | `ed07f25ee0eb69b5d56553e2ddfee0cf571d45e6d32e9fb47b5e58605ae6d7e4` |
+| `synterra-surf-1.2.0-linux-x86_64.tar.gz` | 186,520 | `8a1af8de32a458f33ee4414f7e78627fbf38867d4aa50bd864c77bcae812a1d0` |
+| `synterra-release-2.0.2020-1-x86_64.pkg.tar.zst` | 6,767,646 | `78fd9fa2bd0dacabec8fd3e0d4506c531fd6607f315bc129eca4050850df67c3` |
 
-A full partitioning/install/first-login cycle and end-to-end authenticated release upgrade remain outstanding, along with encrypted installations, VMware 3D, multiple displays and broader hardware testing. The dock remains primary-display only and does not yet provide a complete tray/notification center.
+The artifacts are under `out/`. ISO/browser checksums are `SHA256SUMS.2020`
+and `SHA256SUMS.surf`. The desktop package, canonical `synterra-update.json`
+manifest and `SHA256SUMS.update` are also grouped in `out/2020-work/`.
+That folder retains verification logs and notice/boot previews.
+The GitHub release includes two ISO parts, checksums, the browser-only archive,
+desktop update package/manifest, notice previews and both boot-menu captures.
 
-The published release's earlier validation is archived in [1.1 status](BUILD-STATUS-1.1.md).
+The temporary build filesystem was removed after verification. Source/compile
+caches, verification logs and release artifacts are retained.
+
+## Remaining system coverage
+
+The image retains the verified Arch package/kernel base from the previous
+release; it does not claim a fresh update of all Arch packages. Full disk
+installation/first-login, end-to-end authenticated release upgrades, encrypted
+installation, VMware 3D, multiple displays and broader hardware still need
+validation. Synaqua remains a desktop shell using KWin/Plasma services.

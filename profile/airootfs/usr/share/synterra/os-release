@@ -1,10 +1,10 @@
 NAME="Synterra"
-PRETTY_NAME="Synterra 2.0 Build 2010"
+PRETTY_NAME="Synterra 2.0 Build 2020"
 ID=synterra
 ID_LIKE=arch
 VERSION_ID=2.0
-VERSION="2.0 Build 2010 (Variscite)"
-BUILD_ID=2010
+VERSION="2.0 Build 2020 (Variscite)"
+BUILD_ID=2020
 VERSION_CODENAME=variscite
 ANSI_COLOR="38;2;125;183;255"
 LOGO=synterra

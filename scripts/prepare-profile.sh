@@ -17,6 +17,7 @@ install -Dm755 "$repo/target/release/synterra-tools" "$dest/airootfs/usr/local/l
 cmake -S "$repo/browser" -B "$repo/target/surf" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$repo/target/surf" --parallel 2
 "$repo/target/surf/synterra-surf" --self-test
+ctest --test-dir "$repo/target/surf" --output-on-failure
 install -Dm755 "$repo/target/surf/synterra-surf" "$dest/airootfs/usr/local/bin/synterra-surf"
 cmake -S "$repo/desktop" -B "$repo/target/hub" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$repo/target/hub" --parallel 2
@@ -108,7 +109,7 @@ iso_name="synterra"
 iso_label="SYNTERRA_$(date -u +%Y%m)"
 iso_publisher="Synterra"
 iso_application="Synterra Glass Live Desktop"
-iso_version="2.0.2010"
+iso_version="2.0.2020"
 # Zstandard keeps live-image decompression fast and bounds build CPU usage.
 airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M' '-processors' '4')

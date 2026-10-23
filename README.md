@@ -2,7 +2,37 @@
 
 An Arch-based x86_64 live distribution with Synaqua, the Aero-inspired Synaqua desktop using KWin/Plasma services.
 
-Development release: **Synterra 2.0 (Variscite), Build 2010**, introducing **Synterra Updates**. Download the [Build 2010 prerelease](https://github.com/realphoni/synterra/releases/tag/v2.0.2010). The 1.1 full release remains available below.
+Development release: **Synterra 2.0 (Variscite), Build 2020**, focused on **Synterra Surf 1.2**. Download the [Build 2020 prerelease](https://github.com/realphoni/synterra/releases/tag/v2.0.2020). The 1.1 full release remains available below.
+
+## New in Build 2020: Surf notices
+
+Surf 1.2 adds a notice strip below the address bar. Blue information notices and amber warnings follow the active site or supported search topic. Notices can be dismissed per tab, restored from Menu, cycled when several topics match, or disabled in Settings. There are separate controls for search topics and playful messages. Source buttons open only when clicked.
+
+The 21 built-in topics include Roblox, OpenAI/ChatGPT, Gemini, X/Twitter, Momentum, Tactico, Synterra, Phoni Technology, Steam, AO3 and Ace Attorney. Ace Attorney also has a rare alternate message. Matching happens on the device, without scanning page content or sending notice checks to a service. Private-window dismissals remain in memory.
+
+See the [Surf notice guide and content catalog](docs/SURF-NOTICES.md) and [current build status](docs/BUILD-STATUS.md). The source catalog is `browser/notices.json`. The release includes `synterra-surf-1.2.0-linux-x86_64.tar.gz` and `SHA256SUMS.surf` for updating only the browser on an existing x86_64 Synterra/Arch installation. Close Surf, extract the archive and follow its `README.txt`; existing profiles and bookmarks are retained.
+
+## Download Synterra 2.0 Build 2020
+
+Download **both** `synterra-2.0.2020-x86_64.iso.part00` and `.part01`, plus `SHA256SUMS` and `SHA256SUMS.parts`, from the [Build 2020 release](https://github.com/realphoni/synterra/releases/tag/v2.0.2020). The parts are not bootable until joined.
+
+Linux:
+
+```bash
+sha256sum -c SHA256SUMS.parts
+cat synterra-2.0.2020-x86_64.iso.part00 synterra-2.0.2020-x86_64.iso.part01 > synterra-2.0.2020-x86_64.iso
+sha256sum -c SHA256SUMS
+```
+
+Windows Command Prompt:
+
+```cmd
+copy /b synterra-2.0.2020-x86_64.iso.part00+synterra-2.0.2020-x86_64.iso.part01 synterra-2.0.2020-x86_64.iso
+```
+
+Then check the image in PowerShell with `Get-FileHash .\synterra-2.0.2020-x86_64.iso -Algorithm SHA256`. Expected SHA-256: `ed07f25ee0eb69b5d56553e2ddfee0cf571d45e6d32e9fb47b5e58605ae6d7e4`. Assembled size: **2,580,217,856 bytes**.
+
+This is a development prerelease. Native browser tests, image integrity and BIOS/UEFI menu checks passed. A fresh full desktop boot and installation cycle were not rerun for Build 2020. Use a disposable test VM first. The updater accepts full releases and does not install this prerelease automatically.
 
 ## Download Synterra 2.0 Build 2010
 

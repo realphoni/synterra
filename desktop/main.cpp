@@ -74,7 +74,7 @@ class Hub final : public QWidget {
     }
 protected:
     void closeEvent(QCloseEvent *event) override {
-        settings.setValue("seenVersion", "2.0.2010");
+        settings.setValue("seenVersion", "2.0.2020");
         settings.setValue("showOnLogin", startup->isChecked());
         QWidget::closeEvent(event);
     }
@@ -85,7 +85,7 @@ public:
         auto layout = new QVBoxLayout(this); layout->setContentsMargins(22, 22, 22, 18); layout->setSpacing(16);
         auto hero = new QWidget(this); hero->setObjectName("hero"); auto heroRow = new QHBoxLayout(hero);
         auto orb = new QLabel(hero); orb->setPixmap(QIcon(":/hub/synterra.svg").pixmap(72, 72)); heroRow->addWidget(orb);
-        auto heading = new QLabel("<h1>Synterra 2.0</h1><p>Build 2010 · Variscite · Meet Synaqua.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
+        auto heading = new QLabel("<h1>Synterra 2.0</h1><p>Build 2020 · Variscite · Meet Synaqua.</p>", hero); heroRow->addWidget(heading, 1); layout->addWidget(hero);
         auto tabs = new QTabWidget(this); layout->addWidget(tabs, 1);
         auto setup = new QWidget(tabs); auto setupLayout = new QVBoxLayout(setup);
         auto mode = new QLabel(live ? "Explore the live desktop, or install Synterra on your own disk." : "Welcome home. Set up your desktop and keep it up to date.", setup);
@@ -123,7 +123,7 @@ public:
         appLayout->addStretch(); tabs->addTab(apps, "Applications");
         auto about = new QWidget(tabs); auto aboutLayout = new QVBoxLayout(about);
         const auto desktopName = qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" ? "Synaqua 0.2" : "KDE Plasma";
-        auto system = new QLabel("Synterra 2.0 Build 2010\nVariscite · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
+        auto system = new QLabel("Synterra 2.0 Build 2020\nVariscite · Arch-based · " + QString(desktopName) + "\n\nHost: " + QSysInfo::machineHostName() + "\nArchitecture: " + QSysInfo::currentCpuArchitecture() + "\nKernel: " + QSysInfo::kernelVersion(), about);
         system->setTextFormat(Qt::PlainText); system->setTextInteractionFlags(Qt::TextSelectableByMouse); aboutLayout->addWidget(system);
         auto help = new QPushButton("Synterra documentation", about); aboutLayout->addWidget(help);
         connect(help, &QPushButton::clicked, this, [this] { launch("synterra-surf", {"https://github.com/realphoni/synterra#readme"}); });
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
     GlassAppearance::syncPalette();
     QSettings settings;
     if (app.arguments().contains("--welcome") && qEnvironmentVariable("XDG_SESSION_DESKTOP") == "synaqua" && !settings.value("showOnLogin", false).toBool()) return 0;
-    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "2.0.2010" && !settings.value("showOnLogin", false).toBool()) return 0;
+    if (app.arguments().contains("--welcome") && settings.value("seenVersion").toString() == "2.0.2020" && !settings.value("showOnLogin", false).toBool()) return 0;
     Hub window(QDir("/run/archiso").exists()); window.show();
     if (app.arguments().contains("--smoke-test")) {
         QTimer::singleShot(250, &app, [&app, &window] {

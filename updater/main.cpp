@@ -104,7 +104,7 @@ public:
         auto hero = new QFrame; hero->setObjectName("hero"); auto heroLayout = new QVBoxLayout(hero); heroLayout->setContentsMargins(22,18,22,18);
         auto title = new QLabel("<h1>Synterra Updates</h1>"); heroLayout->addWidget(title);
         heroLayout->addWidget(new QLabel("Variscite · Your next release, ready when you are.")); layout->addWidget(hero);
-        current = new QLabel("Synterra 2.0 · Build 2010"); layout->addWidget(current);
+        current = new QLabel("Synterra 2.0 · Build 2020"); layout->addWidget(current);
         status = new QLabel("Stay in step with Synterra"); status->setObjectName("status"); status->setWordWrap(true); layout->addWidget(status);
         detail = new QLabel("Checks full releases on GitHub, downloads newer updates and asks before installing."); detail->setWordWrap(true); detail->setTextFormat(Qt::PlainText); layout->addWidget(detail);
         progress = new QProgressBar; progress->hide(); layout->addWidget(progress);
